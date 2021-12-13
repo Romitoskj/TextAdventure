@@ -1,6 +1,7 @@
 package it.uniroma1.textadv;
 
 import it.uniroma1.textadv.oggetti.Subject;
+import it.uniroma1.textadv.personaggi.Giocatore;
 
 public class Test {
 
@@ -9,22 +10,16 @@ public class Test {
 		Mondo m = Mondo.fromFile("minizak.game");
 		//System.out.println(m);
 		//System.out.println(Giocatore.getInstance());
-		//System.out.println(m.getOggetti());
+		System.out.println(m.getOggetti());
+		System.out.println(m.getLinks());
 		//System.out.println(m.getPersonaggi());
-		System.out.println(m.getPersonaggio("guardiano del tesoro"));
-		System.out.println(m.getPersonaggio("Tom"));
-		((Subject) m.getOggetto("tesoro")).notificaObservers();
-		((Subject) m.getOggetto("secchio")).notificaObservers();
-		((Subject) m.getOggetto("tronchesi")).notificaObservers();
-		m.getPersonaggio("guardiano del tesoro").store(((Storable)m.getPersonaggio("neo")));
-		((Subject) m.getOggetto("tesoro")).notificaObservers();
-		//System.out.println(m.getStanze());
+
+		Giocatore p = Giocatore.getInstance();
+		System.out.println(p);
+		p.goThrough(p.getPosizione().getLink("salone di Zak"));
+		System.out.println(p);
+		p.goThrough(p.getPosizione().getLink(Direzione.NORD));
+		System.out.println(p);
 		g.play(m);
 	}
 }
-// TODO martello rompe salvadanaio
-// TODO cacciavite svita vite
-// TODO secchio si riempie nel pozzo
-// TODO tronchesi aprono armadio luccicante
-// TODO secchio PIENO spegne camino
-// TODO scrivania e cassetto si aprono e si guardano

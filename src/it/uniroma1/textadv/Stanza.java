@@ -18,13 +18,13 @@ public class Stanza implements Named {
      */
     public static class Builder {
         // required parameters
-        private String nome;
-        private String descrizione;
+        private final String nome;
+        private final String descrizione;
 
         // optional parameters
-        private Map<String, Oggetto> oggetti;
-        private Map<String, Personaggio> personaggi;
-        private Map<Direzione, Link> links;
+        private final Map<String, Oggetto> oggetti;
+        private final Map<String, Personaggio> personaggi;
+        private final Map<Direzione, Link> links;
 
         /**
          * Crea un Builder dati il nome della stanza e la sua descrizione.
@@ -82,32 +82,28 @@ public class Stanza implements Named {
     /**
      * Nome della stanza.
      */
-    private String nome;
+    private final String nome;
 
     /**
      * Descrizione della stanza.
      */
-    private String descrizione;
+    private final String descrizione;
 
     /**
      * Dizionario degli oggetti presenti nella stanza indicizzati dal loro nome.
      */
-    private Map<String, Oggetto> oggetti;
+    private final Map<String, Oggetto> oggetti;
 
     /**
      * Dizionario dei personaggi presenti nella stanza indicizzati dal loro nome.
      */
-    private Map<String, Personaggio> personaggi;
+    private final Map<String, Personaggio> personaggi;
 
     /**
      * Dizionario dei link presenti nella stanza indicizzati dal loro nome.
      */
-    private Map<Direzione, Link> links;
+    private final Map<Direzione, Link> links;
 
-    /**
-     * Crea una stanza a partire da un suo {@link Builder}.
-     * @param builder
-     */
     private Stanza(Builder builder) {
         nome = builder.nome;
         descrizione = builder.descrizione;
@@ -121,11 +117,35 @@ public class Stanza implements Named {
         return nome;
     }
 
+    public String getDescrizione() {
+        return descrizione;
+    }
+
     @Override
     public String toString() {
         return "{" +
                 "nome='" + nome + '\'' +
                 ", descrizione='" + descrizione + '\'' +
                 '}';
+    }
+
+    public Link getLink(Direzione dir) {
+        return links.get(dir);
+    }
+
+    public Link getLink(String nome) {
+        for (Link l : links.values()) {
+            if (l.getNome().equalsIgnoreCase(nome))
+                return l;
+        }
+        return null;
+    }
+
+    public Oggetto getOggetto(String nome) {
+        return oggetti.get(nome);
+    }
+
+    public Personaggio getPersonaggio(String nome) {
+        return personaggi.get(nome);
     }
 }

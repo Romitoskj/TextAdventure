@@ -6,15 +6,12 @@ import it.uniroma1.textadv.personaggi.Observer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tronchesi extends Oggetto implements Storable, Subject {
-
-    private String apre;
+public class Tronchesi extends Opener implements Storable, Subject {
 
     private final List<Observer> observers = new ArrayList<>();
 
     public Tronchesi(String nome, String apre) {
-        super(nome);
-        this.apre = apre;
+        super(nome, apre);
     }
 
     @Override

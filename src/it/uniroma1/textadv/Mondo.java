@@ -11,6 +11,7 @@ import java.util.*;
 import it.uniroma1.textadv.exceptions.NotCreatedWorldException;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Oggetto;
+import it.uniroma1.textadv.oggetti.Opener;
 import it.uniroma1.textadv.personaggi.Giocatore;
 import it.uniroma1.textadv.personaggi.Personaggio;
 
@@ -33,11 +34,6 @@ public class Mondo {
 	 * Descrizione del mondo.
 	 */
 	private final String description;
-
-	/**
-	 * Nome della stanza di partenza.
-	 */
-	private final String start;
 
 	/**
 	 * Dizionario contenente tutti gli oggetti del mondo indicizzati con il loro nome.
@@ -64,12 +60,10 @@ public class Mondo {
 	 *
 	 * @param name Il nome del mondo.
 	 * @param description La descrizione del mondo.
-	 * @param start Il nome della stanza di partenza.
 	 */
-	private Mondo(String name, String description, String start) {
+	private Mondo(String name, String description) {
 		this.name = name;
 		this.description = description;
-		this.start = start;
 	}
 
 	/**
@@ -179,7 +173,7 @@ public class Mondo {
 	 * @throws IOException - se occorre un errore I/O leggendo il file
 	 */
 	public static Mondo fromFile(Path path) throws IOException {
-		String sectionType, sectionInfo = null;
+		String sectionType, sectionInfo = null, playerText = null, start = null;
 		List<String> charactersText = new ArrayList<>(), objectsText = new ArrayList<>(), linksText = new ArrayList<>(), text = Files.readAllLines(path);
 		Map<String, List<String>> roomsText = new HashMap<>();
 		List<List<String>> sections = sections(text);
@@ -192,7 +186,7 @@ public class Mondo {
 			if (sectionTitle.length > 1) sectionInfo = sectionTitle[1];
 			switch (sectionType) {
 				case "world" -> {
-					String name = null, description = null, start = null;
+					String name = null, description = null;
 					for (String line : section) {
 						name = sectionInfo;
 						if (line.startsWith("description"))
@@ -200,12 +194,12 @@ public class Mondo {
 						else if (line.startsWith("start"))
 							start = line.split("\t")[1];
 					}
-					INSTANCE = new Mondo(name, description, start);
+					INSTANCE = new Mondo(name, description);
 				}
 				case "characters" -> charactersText = section;
 				case "links" -> linksText = section;
 				case "objects" -> objectsText = section;
-				case "player" -> createPlayer(section.get(0));
+				case "player" -> playerText = section.get(0);
 				case "room" -> roomsText.put(sectionInfo, section);
 			}
 		}
@@ -214,6 +208,7 @@ public class Mondo {
 		INSTANCE.readObjects(objectsText);
 		INSTANCE.readCharacters(charactersText);
 		INSTANCE.readRooms(roomsText);
+		INSTANCE.createPlayer(playerText, start);
 		return INSTANCE;
 	}
 
@@ -237,8 +232,8 @@ public class Mondo {
 		return sections;
 	}
 
-	private static void createPlayer(String playerText) {
-		Giocatore.init(playerText.split("\\t")[0]);
+	private void createPlayer(String playerText, String start) {
+		Giocatore.init(playerText.split("\\t")[0], STANZE.get(start));
 	}
 
 	private Link createLink(String linkText) {
@@ -260,6 +255,7 @@ public class Mondo {
 		Oggetto oggetto = null;
 		String[] oggettoInfo = oggettoText.split("\\t");
 		String name = oggettoInfo[0], param;
+		Link l;
 		try {
 			Class<?> c = Class.forName("it.uniroma1.textadv.oggetti." + oggettoInfo[1]);
 			Class<? extends Oggetto> oggettoCls = c.asSubclass(Oggetto.class);
@@ -268,8 +264,10 @@ public class Mondo {
 				param = oggettoInfo[2];
 				constr = oggettoCls.getConstructor(String.class, String.class);
 				oggetto = constr.newInstance(name, param);
-				if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.LinkOpener"))) {
-					LINKS.get(param).lock();
+				if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.Opener"))) {
+					l = LINKS.get(param);
+					if (l != null) // se oggetto è un opener di un link (param chiave in link)
+						l.lock((Opener) oggetto);
 				}
 			} else {
 				constr = oggettoCls.getConstructor(String.class);

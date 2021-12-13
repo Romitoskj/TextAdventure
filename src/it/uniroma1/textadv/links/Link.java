@@ -1,33 +1,56 @@
 package it.uniroma1.textadv.links;
 
+import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.Named;
 import it.uniroma1.textadv.oggetti.Opener;
 
-public class Link implements Named {
+import java.util.HashSet;
+import java.util.Set;
+
+public class Link implements Named, Lockable {
 
 	private final String nome;
-	private final String stanza1;
-	private final String stanza2;
+	private final Set<String> stanze = new HashSet<>();
+	private boolean closed;
 	private boolean locked;
 
 	public Link(String nome, String stanza1, String stanza2) {
 		this.nome = nome;
-		this.stanza1 = stanza1;
-		this.stanza2 = stanza2;
+		stanze.add(stanza1);
+		stanze.add(stanza2);
+	}
+	public Link(String nome, String stanza1, String stanza2, boolean closed) {
+		this(nome, stanza1, stanza2);
+		this.closed = closed;
 	}
 
+	public Set<String> getStanze() {
+		return new HashSet<>(stanze);
+	}
+
+	@Override
 	public String getNome() {
 		return nome;
 	}
 
-	public void lock() {
-		locked = true;
-	} // forse richiedere opener anche per chiudere
+	@Override
+	public void lock(Opener opener) {
+		if (nome.equals(opener.getToOpen())) {
+			locked = true;
+			closed = true;
+		}
+	}
 
-	public boolean unlock(Opener opener) {
+	@Override
+	public void unlock(Opener opener) {
 		if (nome.equals(opener.getToOpen())) {
 			locked = false;
+			open();
 		}
+	}
+
+	@Override
+	public boolean isUnlocked() {
 		return !locked;
 	}
 
@@ -36,5 +59,17 @@ public class Link implements Named {
 		return "{" +
 				(locked? "LOCKED" : "") +
 				'}';
+	}
+
+	@Override
+	public boolean isOpen() {
+		return !closed;
+	}
+
+	@Override
+	public void open() {
+		if (isUnlocked()) {
+			closed = false;
+		}
 	}
 }

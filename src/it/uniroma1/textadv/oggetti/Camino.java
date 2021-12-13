@@ -2,13 +2,14 @@ package it.uniroma1.textadv.oggetti;
 
 public class Camino extends Container {
 
-    private boolean acceso = true;
-
     public Camino(String nome, String contents) {
-        super(nome, contents);
+        super(nome, contents, true);
     }
 
-    public void spegni(Secchio s) {
-        if (s.isPieno()) acceso = false;
+    @Override
+    public void unlock(Opener opener) {
+        if (opener instanceof Secchio) {
+            if (((Secchio) opener).isPieno()) super.unlock(opener);
+        }
     }
 }

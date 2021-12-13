@@ -1,8 +1,8 @@
 package it.uniroma1.textadv.oggetti;
 
-public class Cacciavite extends Oggetto{
+public class Cacciavite extends Opener {
 
     public Cacciavite(String nome) {
-        super(nome);
+        super(nome, "vite");
     }
 }

@@ -6,14 +6,14 @@ import it.uniroma1.textadv.personaggi.Observer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Secchio extends Oggetto implements Storable, Subject {
+public class Secchio extends Opener implements Storable, Subject {
 
     private boolean pieno = false;
 
     private final List<Observer> observers = new ArrayList<>();
 
     public Secchio(String nome) {
-        super(nome);
+        super(nome, "camino");
     }
 
     public boolean isPieno() {
@@ -35,5 +35,9 @@ public class Secchio extends Oggetto implements Storable, Subject {
         for (Observer o : observers) {
             o.update();
         }
+    }
+
+    public void riempi(Pozzo p) {
+        pieno = true;
     }
 }
