@@ -369,5 +369,9 @@ public class Mondo {
 			STANZE.put(nome, builder.build());
 		}
 	}
-
+	// TODO Il metodo per il caricamento deve controllare (ed emettere il conseguente errore) se:
+	//  lo stesso oggetto o personaggio viene inserito in più stanze,
+	//  se gli oggetti specificati in ogni stanza sono sempre associati a una classe Java corrispondente,
+	//  altri eventuali errori che possono rendere impossibile la creazione del mondo (ad es. due stanze od oggetti con
+	//  lo stesso nome).
 }
