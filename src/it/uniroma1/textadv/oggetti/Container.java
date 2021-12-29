@@ -74,7 +74,6 @@ public abstract class Container extends Oggetto implements Lockable {
         return "{" +
                 "nome='" + nome + '\'' +
                 (isOpen()? ", content='" + content  + '\'':"") +
-                ", " + (locked? "LOCKED" : "UNLOCKED") +
                 '}';
     }
 }

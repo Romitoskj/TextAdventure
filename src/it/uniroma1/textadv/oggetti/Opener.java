@@ -1,7 +1,7 @@
 package it.uniroma1.textadv.oggetti;
 
 
-public abstract class Opener extends Oggetto implements Locker {
+public abstract class Opener extends Oggetto {
 
     private final String toOpen;
 

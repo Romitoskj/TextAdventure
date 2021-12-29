@@ -315,6 +315,15 @@ public class Mondo {
 			oggetto = createOggetto(oggettoText);
 			OGGETTI.put(oggetto.getNome(), oggetto);
 		}
+		Container container;
+		Oggetto toPut;
+		for (Oggetto o : OGGETTI.values()) {
+			if (o instanceof Container) {
+				container = (Container) o;
+				toPut = OGGETTI.get(container.getContentName());
+				if (toPut instanceof Storable) container.put((Storable) toPut);
+			}
+		}
 	}
 
 	private void readCharacters(List<String> charactersText) {
@@ -322,15 +331,6 @@ public class Mondo {
 		for (String personaggioText : charactersText) {
 			personaggio = createPersonaggio(personaggioText);
 			PERSONAGGI.put(personaggio.getNome(), personaggio);
-		}
-		Container container;
-		Oggetto toPut;
-		for (Oggetto oggetto : OGGETTI.values()) {
-			if (oggetto instanceof Container) {
-				container = (Container) oggetto;
-				toPut = OGGETTI.get(container.getContentName());
-				if (toPut instanceof Storable) container.put((Storable) toPut);
-			}
 		}
 	}
 

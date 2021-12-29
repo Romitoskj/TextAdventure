@@ -36,6 +36,17 @@ public abstract class Personaggio implements Named {
 		return inventario.get(name);
 	}
 
+	public Storable remove(String name) {
+		return inventario.remove(name);
+	}
+
+	public boolean dai(String itemName, Personaggio p) {
+		Storable item = remove(itemName);
+		if (item == null) return false;
+		p.store(item);
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "{" +
