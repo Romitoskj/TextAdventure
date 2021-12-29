@@ -18,7 +18,7 @@ public enum Direzione {
 
 	/**
 	 * Crea una direzione a partire dai suoi possibili nomi.
-	 * @param names - sequenza di nomi
+	 * @param names sequenza di nomi
 	 */
 	Direzione(String... names) {
 		this.names = new HashSet<>(Arrays.asList(names));
@@ -26,7 +26,7 @@ public enum Direzione {
 
 	/**
 	 * Restituisce una direzione dato un suo nome.
-	 * @param name - nome della direzione
+	 * @param name nome della direzione
 	 * @return direzione.
 	 */
 	public static Direzione get(String name) {

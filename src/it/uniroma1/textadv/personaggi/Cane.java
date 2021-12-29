@@ -7,4 +7,9 @@ public class Cane extends Personaggio {
 
 	}
 
+	@Override
+	public String parla() {
+		return "BAU!";
+	}
+
 }

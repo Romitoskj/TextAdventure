@@ -10,6 +10,7 @@ import java.util.*;
 
 import it.uniroma1.textadv.exceptions.NotCreatedWorldException;
 import it.uniroma1.textadv.links.Link;
+import it.uniroma1.textadv.oggetti.Container;
 import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.oggetti.Opener;
 import it.uniroma1.textadv.personaggi.Giocatore;
@@ -321,6 +322,15 @@ public class Mondo {
 		for (String personaggioText : charactersText) {
 			personaggio = createPersonaggio(personaggioText);
 			PERSONAGGI.put(personaggio.getNome(), personaggio);
+		}
+		Container container;
+		Oggetto toPut;
+		for (Oggetto oggetto : OGGETTI.values()) {
+			if (oggetto instanceof Container) {
+				container = (Container) oggetto;
+				toPut = OGGETTI.get(container.getContentName());
+				if (toPut instanceof Storable) container.put((Storable) toPut);
+			}
 		}
 	}
 

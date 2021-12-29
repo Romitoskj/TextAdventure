@@ -56,9 +56,8 @@ public class Link implements Named, Lockable {
 
 	@Override
 	public String toString() {
-		return "{" +
-				(locked? "LOCKED" : "") +
-				'}';
+		return nome + " è " +
+				(isOpen()? "aperta" : "chiusa");
 	}
 
 	@Override

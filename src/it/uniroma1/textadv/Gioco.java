@@ -13,16 +13,19 @@ public class Gioco {
 		Command command;
 
 		System.out.println(world);
+		System.out.println("In ogni momento potrai scrivere \"aiuto\" se hai bisogno di una mano con i comandi.");
+		System.out.println("Scrivi guarda per guardarti intorno e iniziare il gioco!");
 		do {
 			System.out.print("> ");
 			input = scanner.nextLine();
 			command = new Command(input);
 			output = command.run();
 			System.out.println(output);
-		} while (!input.equalsIgnoreCase("q"));
+		} while (!input.equalsIgnoreCase("esci"));
 	}
 
 	public void play(Mondo world, Path scriptFF) {
 		
 	}
 }
+// TODO gioco observer giocatore, quando ottiene tesoro vittoria

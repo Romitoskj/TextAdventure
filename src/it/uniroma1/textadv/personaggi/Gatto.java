@@ -9,4 +9,8 @@ public class Gatto extends Personaggio implements Storable {
 
 	}
 
+	@Override
+	public String parla() {
+		return "MIAO!";
+	}
 }

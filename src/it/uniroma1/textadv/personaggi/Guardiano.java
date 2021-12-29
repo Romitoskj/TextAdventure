@@ -32,6 +32,11 @@ public class Guardiano extends Personaggio implements Observer {
 	}
 
 	@Override
+	public String parla() {
+		return "Non mi distrarrai dal mio compito tanto facilmente! Finché sono vivo il tesoro non verrà neanche toccato!";
+	}
+
+	@Override
 	public String toString() {
 		return "Guardiano{" +
 				"watched=" + watched +

@@ -2,6 +2,7 @@ package it.uniroma1.textadv.personaggi;
 
 import it.uniroma1.textadv.Mondo;
 import it.uniroma1.textadv.Stanza;
+import it.uniroma1.textadv.Storable;
 import it.uniroma1.textadv.exceptions.AlreadyCreatedPlayerException;
 import it.uniroma1.textadv.exceptions.NotInitializedPlayerException;
 import it.uniroma1.textadv.links.Link;
@@ -36,6 +37,11 @@ public class Giocatore extends Personaggio {
 	public Stanza getPosizione() {
 		return posizione;
 	}
+
+	public String getInventario() {
+		return inventario.keySet().toString();
+	}
+
 
 	public boolean goThrough(Link link) {
 		if (link.isOpen()) {

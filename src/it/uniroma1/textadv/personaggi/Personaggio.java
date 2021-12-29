@@ -28,12 +28,12 @@ public abstract class Personaggio implements Named {
 		return nome;
 	}
 
-	public Map<String, Storable> getInventario() {
-		return inventario;
-	}
-
 	public void store(Storable toStore) {
 		inventario.put(toStore.getNome(), toStore);
+	}
+
+	public Storable getItem(String name) {
+		return inventario.get(name);
 	}
 
 	@Override
@@ -42,5 +42,9 @@ public abstract class Personaggio implements Named {
 				"nome='" + nome + '\'' +
 				", inventario=" + inventario +
 				'}';
+	}
+
+	public String parla() {
+		return nome;
 	}
 }

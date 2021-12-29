@@ -123,9 +123,12 @@ public class Stanza implements Named {
 
     @Override
     public String toString() {
-        return "{" +
+        return "Stanza{" +
                 "nome='" + nome + '\'' +
                 ", descrizione='" + descrizione + '\'' +
+                ", oggetti=" + oggetti +
+                ", personaggi=" + personaggi +
+                ", links=" + links +
                 '}';
     }
 
@@ -145,7 +148,15 @@ public class Stanza implements Named {
         return oggetti.get(nome);
     }
 
+    public Oggetto removeOggetto(String nome) {
+        return oggetti.remove(nome);
+    }
+
     public Personaggio getPersonaggio(String nome) {
         return personaggi.get(nome);
+    }
+
+    public Personaggio removePersonaggio(String nome) {
+        return personaggi.remove(nome);
     }
 }
