@@ -53,6 +53,14 @@ public class Giocatore extends Personaggio {
 			return false;
 	}
 
+	public boolean lascia(String toLeave) {
+		Storable s = getItem(toLeave);
+		if (s == null) return false;
+		remove(toLeave);
+		posizione.add(s);
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "Giocatore{" +

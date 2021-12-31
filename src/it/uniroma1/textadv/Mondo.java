@@ -354,11 +354,11 @@ public class Mondo {
 					switch (lineText[0]) {
 						case "objects" -> {
 							for (String oggetto : lineText[1].split(","))
-								builder.addOggetto(OGGETTI.get(oggetto.strip()));
+								builder = builder.addOggetto(OGGETTI.get(oggetto.strip()));
 						}
 						case "characters" -> {
 							for (String personaggio : lineText[1].split(","))
-								builder.addPersonaggio(PERSONAGGI.get(personaggio.strip()));
+								builder = builder.addPersonaggio(PERSONAGGI.get(personaggio.strip()));
 						}
 						case "links" -> {
 							for (String dirLink : lineText[1].split(",")) {
@@ -370,7 +370,7 @@ public class Mondo {
 									LINKS.put(linkArray[1], link);
 									LINKS.put(nome, new Link(nome, linkArray[1], nome));
 								}
-								builder.addLink(dir, link);
+								builder = builder.addLink(dir, link);
 							}
 						}
 					}

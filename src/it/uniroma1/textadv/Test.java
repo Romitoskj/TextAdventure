@@ -1,8 +1,5 @@
 package it.uniroma1.textadv;
 
-import it.uniroma1.textadv.oggetti.Subject;
-import it.uniroma1.textadv.personaggi.Giocatore;
-
 public class Test {
 
 	public static void main(String[] args) throws Exception {
@@ -20,7 +17,6 @@ public class Test {
 		System.out.println(p);
 		p.goThrough(p.getPosizione().getLink(Direzione.NORD));
 		System.out.println(p);*/
-
 
 		g.play(m);
 	}

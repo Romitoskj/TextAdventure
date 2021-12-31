@@ -11,14 +11,13 @@ public abstract class Oggetto implements Named {
 		this.nome = nome;
 	}
 
+	@Override
 	public String getNome() {
 		return nome;
 	}
 
 	@Override
 	public String toString() {
-		return "{" +
-				"nome='" + nome + '\'' +
-				'}';
+		return getNome();
 	}
 }

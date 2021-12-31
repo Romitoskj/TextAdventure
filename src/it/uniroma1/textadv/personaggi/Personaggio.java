@@ -59,3 +59,4 @@ public abstract class Personaggio implements Named {
 		return nome;
 	}
 }
+// TODO cerca nella stanza

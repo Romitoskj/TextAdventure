@@ -71,9 +71,6 @@ public abstract class Container extends Oggetto implements Lockable {
 
     @Override
     public String toString() {
-        return "{" +
-                "nome='" + nome + '\'' +
-                (isOpen()? ", content='" + content  + '\'':"") +
-                '}';
+        return nome + (isOpen()? (content != null? " che contiene " + content : " che non contiene più nulla") : "") + ".";
     }
 }
