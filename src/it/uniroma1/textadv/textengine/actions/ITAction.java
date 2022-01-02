@@ -1,4 +1,8 @@
-package it.uniroma1.textadv.textengine;
+package it.uniroma1.textadv.textengine.actions;
+
+import it.uniroma1.textadv.exceptions.ActionNotKnownException;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -32,7 +36,7 @@ public enum ITAction implements Action {
 
     PARLA(Action::speak, "\t\t\tUsalo per dialogare con altri personaggi."),
 
-    ACCAREZZA(Action::speak, "\t\t\t\tUsalo per accarezzare un animale.");
+    ACCAREZZA(Action::speak, "\t\tUsalo per accarezzare un animale.");
 
     private final String DESCRIPTION;
 
@@ -50,6 +54,24 @@ public enum ITAction implements Action {
 
     @Override
     public String execute(List<String> args) {
-        return method.apply(args, Language.IT);
+        return method.apply(args, EnglishAndItalian.IT);
+    }
+
+    public static ActionFactory getFactory () {
+        return new ActionFactory() {
+            @Override
+            public Action getAction(String name) throws ActionNotKnownException {
+                try {
+                    return ITAction.valueOf(name.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new ActionNotKnownException();
+                }
+            }
+
+            @Override
+            public Action[] values() {
+                return ITAction.values();
+            }
+        };
     }
 }

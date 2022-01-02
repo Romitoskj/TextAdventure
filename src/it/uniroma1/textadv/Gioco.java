@@ -2,64 +2,72 @@ package it.uniroma1.textadv;
 
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
+import it.uniroma1.textadv.personaggi.Giocatore;
+import it.uniroma1.textadv.personaggi.Observer;
 import it.uniroma1.textadv.textengine.Command;
-import it.uniroma1.textadv.textengine.Language;
+import it.uniroma1.textadv.textengine.languages.Language;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.LanguageFactory;
 
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Gioco {
+public class Gioco implements Observer {
 
-	private Language language;
+	private LanguageFactory lanFactory = EnglishAndItalian.getFactory();
+
+	private String win = "> ";
+
 
 	public void play(Mondo world) {
 		Scanner scanner = new Scanner(System.in);
 		String input, output;
 		Command command;
+		Language language = null;
+
+		Giocatore.getInstance().registraObserver(this);
 
 		while (language == null) {
-			System.out.print("Seleziona lingua / Select language: " + Arrays.toString(Language.values()) + "\n> ");
+			System.out.print("Seleziona lingua / Select language: " + Arrays.toString(EnglishAndItalian.values()) + "\n> ");
 			try {
-				localizza(Language.get(scanner.nextLine()));
+				language = lanFactory.getLanguage(scanner.nextLine());
+				localizza(language);
 			} catch (LanguageNotKnownException e) {
 				System.out.println("Lingua non riconosciuta / Unrecognized language.");
 			}
 		}
 
 		System.out.println(world);
-		System.out.println(switch (language) {
-			case IT -> "In ogni momento potrai scrivere \"aiuto\" se hai bisogno di una mano con i comandi.\n" +
-					"Scrivi \"guarda\" per guardarti intorno e iniziare l'avventura!";
-			case EN -> "You can write \"help\" in any moment if your struggle with the commands.\n" +
-					"Write \"look\" to look around the room and start the adventure!";
-		});
+		System.out.println(Command.getLanguage().getAnswer("start"));
 		do {
-			System.out.print("> ");
+			System.out.print(win);
 			input = scanner.nextLine();
 			try {
-				command = new Command(language, input);
-				output = command.run();
+				command = new Command(input);
+				output = command.execute();
 			} catch (ActionNotKnownException e) {
-				output = switch (language) {
-					case IT -> "Azione non riconosciuta.";
-					case EN -> "Unrecognized action.";
-				};
+				output = Command.getLanguage().getAnswer("not_found_action");
 			}
 			System.out.println("\n" + output);
 		} while (!input.equalsIgnoreCase("esci") && !input.equalsIgnoreCase("quit"));
 	}
 
 	public void play(Mondo world, Path scriptFF) {
-		localizza(Language.IT);
+		Giocatore.getInstance().registraObserver(this);
+		localizza(EnglishAndItalian.IT);
+	}
+
+	public void setLanguageFactory(LanguageFactory lanFactory) {
+		this.lanFactory = lanFactory;
 	}
 
 	public void localizza(Language language) {
-		this.language = language;
+		Command.setLanguage(language);
 	}
 
-	public Language getLanguage() {
-		return language;
+	@Override
+	public void update() {
+		win = "\n\n" + Command.getLanguage().getAnswer("win") + "\t" + win;
 	}
 }
-// TODO gioco observer giocatore, quando ottiene tesoro vittoria

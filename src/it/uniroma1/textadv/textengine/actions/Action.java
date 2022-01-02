@@ -1,9 +1,10 @@
-package it.uniroma1.textadv.textengine;
+package it.uniroma1.textadv.textengine.actions;
 
 import it.uniroma1.textadv.Direzione;
 import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.Storable;
+import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Breakable;
@@ -12,6 +13,7 @@ import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.oggetti.Opener;
 import it.uniroma1.textadv.personaggi.Animal;
 import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.List;
 
@@ -23,36 +25,31 @@ public interface Action {
 
     String execute(List<String> args);
 
-    static String help(List<String> args, Language lan) {
+    static String help(List<String> args, Language language) {
         if (args.size() > 1) return "Questo comando accetta al massimo un argomento.";
+        ActionFactory actionFactory = language.getActionFactory();
         if (args.size() == 1) {
             String actionName = args.get(0).toUpperCase();
             try {
-                Action a = switch (lan) {
-                    case EN -> ENAction.valueOf(actionName);
-                    case IT -> ITAction.valueOf(actionName);
-                };
+                Action a = actionFactory.getAction(actionName);
                 return a.getDescription();
-            } catch (IllegalArgumentException e) {
+            } catch (ActionNotKnownException e) {
                 return "Non c'è nessun comando chiamato così...";
             }
         }
         StringBuilder res = new StringBuilder().append("COMANDO\t\t|\t\tDESCRIZIONE\n\n");
-        for (Action a : switch (lan) {
-            case EN -> ENAction.values();
-            case IT -> ITAction.values();
-        }) {
+        for (Action a : actionFactory.values()) {
             res.append(a.getDescription()).append("\n");
         }
         return res.deleteCharAt(res.length() - 1).toString();
     }
 
-    static String quit(List<String> args, Language lan) {
+    static String quit(List<String> args, Language language) {
         if (args.size() > 0) return "Questo comando non accetta argomenti.";
         return "Arrivederci!";
     }
 
-    static String look(List<String> args, Language lan) {
+    static String look(List<String> args, Language language) {
         if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
         if (args.size() > 0) {
             try {
@@ -64,12 +61,12 @@ public interface Action {
         return getInstance().getPosizione().toString();
     }
 
-    static String inventory(List<String> args, Language lan) {
+    static String inventory(List<String> args, Language language) {
         if (args.size() > 0) return "Questo comando non accetta argomenti.";
         return getInstance().getInventario();
     }
 
-    static String go(List<String> args, Language Lan) {
+    static String go(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare dove vuoi andare.";
         if (args.size() > 1) return "Devi specificare un solo argomento.";
         Link link;
@@ -91,7 +88,7 @@ public interface Action {
         return "Il passaggio è chiuso.";
     }
 
-    static String enter(List<String> args, Language lan) {
+    static String enter(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare dove vuoi andare.";
         if (args.size() > 1) return "Devi specificare un solo argomento.";
         Link link;
@@ -104,12 +101,12 @@ public interface Action {
         }
     }
 
-    static String take(List<String> args, Language lan) {
+    static String take(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare cosa vuoi prendere.";
         if (args.size() > 2) return "Devi specificare massimo due argomenti.";
         String name = args.get(0);
-        if (name.equalsIgnoreCase("navetta")) return enter(args, lan);
-        if (args.size() > 1) return collectFrom(name, args.get(1));
+        if (name.equalsIgnoreCase("navetta")) return enter(args, language);
+        if (args.size() > 1) return collectFrom(name, args.get(1), language);
         try {
             if (!getInstance().takeFromRoom(name)) return "Non puoi prenderlo...";
             return "Oggetto aggiunto all'inventario!";
@@ -118,18 +115,18 @@ public interface Action {
         }
     }
 
-    private static String collectFrom(String name, String from) {
+    private static String collectFrom(String name, String from, Language language) {
         try {
             Item item = getInstance().searchItem(from);
-            if (item instanceof Personaggio) return collectFromCharacter(name, (Personaggio) item);
-            if (item instanceof Container) return collectFromContainer(name, (Container) item);
+            if (item instanceof Personaggio) return collectFromCharacter(name, (Personaggio) item, language);
+            if (item instanceof Container) return collectFromContainer(name, (Container) item, language);
             return from + " non è né un contenitore né un personaggio.";
         } catch (ItemNotPresentException e) {
             return "In questa stanza non c'è nulla del genere...";
         }
     }
 
-    private static String collectFromCharacter(String name, Personaggio p) {
+    private static String collectFromCharacter(String name, Personaggio p, Language language) {
         try {
             p.dai(name, getInstance());
             return p.getNome() + " ti ha dato " + name + ".";
@@ -138,7 +135,7 @@ public interface Action {
         }
     }
 
-    private static String collectFromContainer(String name, Container container) {
+    private static String collectFromContainer(String name, Container container, Language language) {
         if (!container.isOpen()) return container + " è chiuso.";
         try {
             Storable toStore = container.removeContent(name);
@@ -150,7 +147,7 @@ public interface Action {
         }
     }
 
-    static String drop(List<String> args, Language lan) {
+    static String drop(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare l'oggetto da lasciare.";
         if (args.size() > 1) return "Puoi lasciare solo un oggetto per volta.";
         try {
@@ -161,7 +158,7 @@ public interface Action {
         }
     }
 
-    static String open(List<String> args, Language lan) {
+    static String open(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare cosa vuoi aprire.";
         Lockable toOpen;
         String name = args.get(0);
@@ -195,20 +192,20 @@ public interface Action {
         return "Fatto!";
     }
 
-    static String breakItem(List<String> args, Language lan) {
+    static String breakItem(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare cosa vuoi aprire.";
         if (args.size() > 2)
             return "Devi specificare solo due oggetti, uno da rompere e uno con cui rompere il primo.";
         try {
             Oggetto o =  (Oggetto) getInstance().searchItem(args.get(0));
             if (!(o instanceof Breakable)) return args.get(0) + " non può essere rotto.";
-            return open(args, lan);
+            return open(args, language);
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessun oggetto chiamato così qui...";
         }
     }
 
-    static String speak(List<String> args, Language lan) {
+    static String speak(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare con chi vuoi parlare.";
         if (args.size() > 1) return "Puoi parlare solo ad un personaggio per volta.";
         try {
@@ -219,7 +216,7 @@ public interface Action {
         }
     }
 
-    static String pet(List<String> args, Language lan) {
+    static String pet(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare chi vuoi accarezzare.";
         if (args.size() > 1) return "Puoi accarezzare solo un animale per volta.";
         try {
@@ -231,7 +228,7 @@ public interface Action {
         }
     }
 
-    static String give(List<String> args, Language lan) {
+    static String give(List<String> args, Language language) {
         if (args.size() < 2) return "Devi specificare cosa vuoi dare e a chi.";
         if (args.size() > 2) return "Devi specificare solamente cosa dare e a chi.";
         String itemName = args.get(0);
@@ -249,7 +246,7 @@ public interface Action {
     }
 
     // TODO USE
-    static String use(List<String> args, Language lan) {
+    static String use(List<String> args, Language language) {
         return "";
     }
 }

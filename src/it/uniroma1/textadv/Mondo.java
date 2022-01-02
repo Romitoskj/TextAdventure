@@ -10,6 +10,7 @@ import java.util.*;
 
 import it.uniroma1.textadv.exceptions.WorldNotCreatedException;
 import it.uniroma1.textadv.links.Link;
+import it.uniroma1.textadv.oggetti.Blocker;
 import it.uniroma1.textadv.oggetti.Container;
 import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.oggetti.Opener;
@@ -283,7 +284,7 @@ public class Mondo {
 	private Personaggio createPersonaggio(String personaggioText) {
 		Personaggio p = null;
 		String[] personaggioInfo = personaggioText.split("\\t");
-		String name = personaggioInfo[0];
+		String name = personaggioInfo[0].toLowerCase();
 		try {
 			Class<?> c = Class.forName("it.uniroma1.textadv.personaggi." + personaggioInfo[1]);
 			Class<? extends Personaggio> linkCls = c.asSubclass(Personaggio.class);
@@ -316,12 +317,16 @@ public class Mondo {
 			OGGETTI.put(oggetto.getNome(), oggetto);
 		}
 		Container container;
+		Blocker blocker;
 		Oggetto toPut;
 		for (Oggetto o : OGGETTI.values()) {
 			if (o instanceof Container) {
 				container = (Container) o;
 				toPut = OGGETTI.get(container.getContentName());
 				if (toPut instanceof Storable) container.put((Storable) toPut);
+			} else if (o instanceof Blocker) {
+				blocker = (Blocker) o;
+				blocker.block(LINKS.get(blocker.getToOpen()));
 			}
 		}
 	}
@@ -354,11 +359,11 @@ public class Mondo {
 					switch (lineText[0]) {
 						case "objects" -> {
 							for (String oggetto : lineText[1].split(","))
-								builder = builder.addOggetto(OGGETTI.get(oggetto.strip()));
+								builder = builder.addOggetto(OGGETTI.get(oggetto.toLowerCase().strip()));
 						}
 						case "characters" -> {
 							for (String personaggio : lineText[1].split(","))
-								builder = builder.addPersonaggio(PERSONAGGI.get(personaggio.strip()));
+								builder = builder.addPersonaggio(PERSONAGGI.get(personaggio.toLowerCase().strip()));
 						}
 						case "links" -> {
 							for (String dirLink : lineText[1].split(",")) {

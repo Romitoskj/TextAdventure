@@ -132,7 +132,7 @@ public class Stanza implements Item {
         Set<String> keySet = m.keySet();
         for (String s : keySet) {
             sb.append(m.get(s).toString())
-                    .append((k == keySet.size() - 2 && k != 0) ? " e " : ", ");
+                    .append((k == keySet.size() - 2) ? " e " : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
@@ -147,7 +147,7 @@ public class Stanza implements Item {
                     .append(d.toString().toLowerCase())
                     .append(" ")
                     .append(links.get(d).getNome())
-                    .append((k == l.size() - 2 && k != 0) ? " e " : ", ");
+                    .append((k == l.size() - 2) ? " e " : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
@@ -158,7 +158,7 @@ public class Stanza implements Item {
         return nome + ": " + descrizione + "." +
                 (oggetti.isEmpty() ? "" : "\nAll'interno ci sono degli oggetti: " + mapList(oggetti)) +
                 (personaggi.isEmpty() ? "" : "\nC'è qualcuno qui: " + mapList(personaggi)) +
-                "\nPer uscire da questa stanza puoi andare: " + linkList();
+                "\nPer uscire da questa stanza puoi sfruttare i seguenti passaggi: " + linkList();
     }
 
     public Link getLink(Direzione dir) throws ItemNotPresentException {
@@ -181,7 +181,7 @@ public class Stanza implements Item {
     }
 
     public Item get(String nome) throws ItemNotPresentException {
-        Item item = oggetti.get(nome);
+        Item item = oggetti.get(nome.toLowerCase());
         if (item == null) {
             for (Oggetto o : oggetti.values()) {
                 if (o instanceof Container) {
@@ -192,7 +192,7 @@ public class Stanza implements Item {
                 }
             }
         }
-        if (item == null) item = personaggi.get(nome);
+        if (item == null) item = personaggi.get(nome.toLowerCase());
         if (item == null) item = getLink(nome);
         if (item == null) throw new ItemNotPresentException();
         return item;

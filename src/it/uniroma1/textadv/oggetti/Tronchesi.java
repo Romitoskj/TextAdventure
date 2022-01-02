@@ -26,9 +26,7 @@ public class Tronchesi extends Opener implements Storable, Subject {
 
     @Override
     public void notificaObservers() {
-        for (Observer o : observers) {
-            o.update();
-        }
+        observers.forEach(Observer::update);
     }
 
     @Override

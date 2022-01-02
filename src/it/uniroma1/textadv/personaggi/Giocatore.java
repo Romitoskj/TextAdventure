@@ -6,14 +6,19 @@ import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.exceptions.PlayerNotInitializedException;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Subject;
+import it.uniroma1.textadv.oggetti.Tesoro;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-public class Giocatore extends Personaggio {
+public class Giocatore extends Personaggio implements Subject{
 
     private static Giocatore instance;
 
     private Stanza posizione;
+
+    private final List<Observer> observers = new ArrayList<>();
 
     private Giocatore(String nome, Stanza start) {
         super(nome);
@@ -79,6 +84,7 @@ public class Giocatore extends Personaggio {
             Subject subject = (Subject) item;
             subject.notificaObservers();
             if (subject.hasObservers()) return false;
+            if (subject instanceof Tesoro) notificaObservers();
         }
         posizione.remove(nome);
         store((Storable) item);
@@ -92,5 +98,25 @@ public class Giocatore extends Personaggio {
                 ", posizione=" + posizione +
                 ", inventario=" + inventario +
                 '}';
+    }
+
+    @Override
+    public void registraObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void rimuoviObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notificaObservers() {
+        observers.forEach(Observer::update);
+    }
+
+    @Override
+    public boolean hasObservers() {
+        return observers.size() > 0;
     }
 }
