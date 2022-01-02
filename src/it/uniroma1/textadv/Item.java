@@ -11,4 +11,6 @@ public interface Item {
      * @return nome.
      */
     String getNome();
+
+    // TODO get description
 }

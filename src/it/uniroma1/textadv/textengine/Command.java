@@ -16,7 +16,7 @@ public class Command {
         // String[] words = input.split("\\s+", 2);
         String[] words = input.split("-+");
         action = FACTORY.createAction(words[0]);
-        arguments = Arrays.stream(words)
+        arguments = Arrays.stream(words) // TODO split riconoscendo argomenti
                 .skip(1)
                 .filter(w -> !l.getSTOP_WORDS().contains(w.toLowerCase()))
                 .collect(Collectors.toList());
