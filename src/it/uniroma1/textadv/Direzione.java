@@ -9,7 +9,10 @@ import java.util.Set;
  */
 public enum Direzione {
 
-	NORD("NORD","N"), SUD("SUD","S"), EST("EST","E"), OVEST("OVEST","O", "W");
+	NORD("NORD", "N", "NORTH"),
+	SUD("SUD", "S", "SOUTH"),
+	EST("EST", "E"),
+	OVEST("OVEST", "O", "WEST", "W");
 
 	/**
 	 * Possibili nomi con cui ci si può riferire alle varie direzioni.

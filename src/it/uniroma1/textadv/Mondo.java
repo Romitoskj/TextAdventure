@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 
-import it.uniroma1.textadv.exceptions.NotCreatedWorldException;
+import it.uniroma1.textadv.exceptions.WorldNotCreatedException;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Container;
 import it.uniroma1.textadv.oggetti.Oggetto;
@@ -146,7 +146,7 @@ public class Mondo {
 	 */
 	public static Mondo getInstance() {
 		if (INSTANCE == null)
-			throw new NotCreatedWorldException();
+			throw new WorldNotCreatedException();
 		return INSTANCE;
 	}
 

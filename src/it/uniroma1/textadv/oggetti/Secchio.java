@@ -32,9 +32,12 @@ public class Secchio extends Opener implements Storable, Subject {
 
     @Override
     public void notificaObservers() {
-        for (Observer o : observers) {
-            o.update();
-        }
+        observers.forEach(Observer::update);
+    }
+
+    @Override
+    public boolean hasObservers() {
+        return observers.size() > 0;
     }
 
     public void riempi(Pozzo p) {

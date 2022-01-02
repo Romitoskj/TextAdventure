@@ -3,7 +3,7 @@ package it.uniroma1.textadv;
 /**
  * Rappresenta tutti ciò che è dotato di un nome.
  */
-public interface Named {
+public interface Item {
 
     /**
      * Restituisce il nome.

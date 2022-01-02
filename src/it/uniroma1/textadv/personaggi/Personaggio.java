@@ -3,11 +3,11 @@ package it.uniroma1.textadv.personaggi;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.uniroma1.textadv.Named;
+import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.Storable;
-import it.uniroma1.textadv.oggetti.Oggetto;
+import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 
-public abstract class Personaggio implements Named {
+public abstract class Personaggio implements Item {
 
 	protected final String nome;
 	
@@ -32,19 +32,21 @@ public abstract class Personaggio implements Named {
 		inventario.put(toStore.getNome(), toStore);
 	}
 
-	public Storable getItem(String name) {
-		return inventario.get(name);
+	public Storable getInventoryItem(String name) throws ItemNotPresentException {
+		Storable s = inventario.get(name);
+		if (s == null)  throw new ItemNotPresentException();
+		return s;
 	}
 
-	public Storable remove(String name) {
-		return inventario.remove(name);
+	public Storable remove(String name) throws ItemNotPresentException {
+		Storable s = inventario.remove(name);
+		if (s == null)  throw new ItemNotPresentException();
+		return s;
 	}
 
-	public boolean dai(String itemName, Personaggio p) {
+	public void dai(String itemName, Personaggio p) throws ItemNotPresentException {
 		Storable item = remove(itemName);
-		if (item == null) return false;
 		p.store(item);
-		return true;
 	}
 
 	@Override
@@ -59,4 +61,3 @@ public abstract class Personaggio implements Named {
 		return nome;
 	}
 }
-// TODO cerca nella stanza

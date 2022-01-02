@@ -30,4 +30,9 @@ public class Tronchesi extends Opener implements Storable, Subject {
             o.update();
         }
     }
+
+    @Override
+    public boolean hasObservers() {
+        return observers.size() > 0;
+    }
 }

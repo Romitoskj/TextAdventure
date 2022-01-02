@@ -9,4 +9,6 @@ public interface Subject {
     void rimuoviObserver(Observer o);
 
     void notificaObservers();
+
+    boolean hasObservers();
 }

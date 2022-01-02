@@ -1,6 +1,8 @@
 package it.uniroma1.textadv;
 
+import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.links.Link;
+import it.uniroma1.textadv.oggetti.Container;
 import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.personaggi.Personaggio;
 
@@ -10,9 +12,10 @@ import java.util.Set;
 
 /**
  * Rappresenta una stanza del mondo di gioco, ossia un qualsiasi spazio in cui può trovarsi il giocatore (sia aperto sia
- * chiuso). Una stanza può inoltre contenere oggetti e personaggi. Ogni stanza è collegata a una o più stanze.
+ * chiuso). Una stanza può inoltre contenere oggetti e personaggi. Ogni stanza è collegata a una o più stanze attraverso
+ * dei {@link Link}.
  */
-public class Stanza implements Named {
+public class Stanza implements Item {
 
     /**
      * Permette la costruzione e la creazione di una {@link Stanza}.
@@ -123,12 +126,12 @@ public class Stanza implements Named {
         return nome;
     }
 
-    private String mapList(Map<String, ? extends Named> m) {
+    private String mapList(Map<String, ? extends Item> m) {
         StringBuilder sb = new StringBuilder();
         int k = 0;
         Set<String> keySet = m.keySet();
         for (String s : keySet) {
-            sb.append(m.get(s).getNome())
+            sb.append(m.get(s).toString())
                     .append((k == keySet.size() - 2 && k != 0) ? " e " : ", ");
             k++;
         }
@@ -158,24 +161,18 @@ public class Stanza implements Named {
                 "\nPer uscire da questa stanza puoi andare: " + linkList();
     }
 
-    public Link getLink(Direzione dir) {
-        return links.get(dir);
+    public Link getLink(Direzione dir) throws ItemNotPresentException {
+        Link l = links.get(dir);
+        if (l == null) throw new ItemNotPresentException();
+        return l;
     }
 
-    public Link getLink(String nome) {
+    public Link getLink(String nome) throws ItemNotPresentException {
         for (Link l : links.values()) {
             if (l.getNome().equalsIgnoreCase(nome))
                 return l;
         }
-        return null;
-    }
-
-    public Oggetto getOggetto(String nome) {
-        return oggetti.get(nome);
-    }
-
-    public void removeOggetto(String nome) {
-        oggetti.remove(nome);
+        throw new ItemNotPresentException();
     }
 
     public void add(Storable s) {
@@ -183,12 +180,26 @@ public class Stanza implements Named {
         if (s instanceof Personaggio) personaggi.put(s.getNome(), (Personaggio) s);
     }
 
-    public Personaggio getPersonaggio(String nome) {
-        return personaggi.get(nome);
+    public Item get(String nome) throws ItemNotPresentException {
+        Item item = oggetti.get(nome);
+        if (item == null) {
+            for (Oggetto o : oggetti.values()) {
+                if (o instanceof Container) {
+                    try {
+                        item = ((Container) o).removeContent(nome);
+                    } catch (ItemNotPresentException ignored) {
+                    }
+                }
+            }
+        }
+        if (item == null) item = personaggi.get(nome);
+        if (item == null) item = getLink(nome);
+        if (item == null) throw new ItemNotPresentException();
+        return item;
     }
 
-    public void removePersonaggio(String nome) {
+    public void remove(String nome) {
+        oggetti.remove(nome);
         personaggi.remove(nome);
     }
 }
-// TODO get e remove su tutte le mappe

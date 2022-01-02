@@ -1,13 +1,13 @@
 package it.uniroma1.textadv.links;
 
 import it.uniroma1.textadv.Lockable;
-import it.uniroma1.textadv.Named;
+import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.oggetti.Opener;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Link implements Named, Lockable {
+public class Link implements Item, Lockable {
 
 	private final String nome;
 	private final Set<String> stanze = new HashSet<>();
@@ -56,8 +56,8 @@ public class Link implements Named, Lockable {
 
 	@Override
 	public String toString() {
-		return nome + " è " +
-				(isOpen()? "aperta" : "chiusa");
+		return "Il passaggio " + nome + " è " +
+				(isOpen()? "aperto" : "chiuso");
 	}
 
 	@Override

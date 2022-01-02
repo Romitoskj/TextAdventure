@@ -1,9 +1,9 @@
 package it.uniroma1.textadv.oggetti;
 
 
-import it.uniroma1.textadv.Named;
+import it.uniroma1.textadv.Item;
 
-public abstract class Oggetto implements Named {
+public abstract class Oggetto implements Item {
 
 	protected String nome;
 

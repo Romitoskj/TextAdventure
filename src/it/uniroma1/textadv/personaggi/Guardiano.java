@@ -2,7 +2,6 @@ package it.uniroma1.textadv.personaggi;
 
 import it.uniroma1.textadv.Mondo;
 import it.uniroma1.textadv.Storable;
-import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.oggetti.Subject;
 
 public class Guardiano extends Personaggio implements Observer {
@@ -20,7 +19,7 @@ public class Guardiano extends Personaggio implements Observer {
 
 	@Override
 	public void update() {
-		System.out.println("Non osare toccare il tesoro o passerai dei guai molto grossi!");
+		System.out.println("\n" + getNome() + ": 'Non osare toccare il tesoro o passerai dei guai molto grossi!'");
 	}
 
 	@Override

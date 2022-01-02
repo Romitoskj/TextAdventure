@@ -1,5 +1,9 @@
 package it.uniroma1.textadv.textengine;
 
+import it.uniroma1.textadv.Direzione;
+import it.uniroma1.textadv.exceptions.ActionNotKnownException;
+import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
+
 import java.util.Set;
 
 public enum Language {
@@ -31,19 +35,27 @@ public enum Language {
         return actionFactory;
     }
 
-    private static Action en(String name) {
+    public static Language get(String name) throws LanguageNotKnownException {
         try {
-            return ENAction.valueOf(name.toUpperCase());
+            return Language.valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new LanguageNotKnownException();
         }
     }
 
-    private static Action it(String name) {
+    private static Action en(String name)  throws ActionNotKnownException {
+        try {
+            return ENAction.valueOf(name.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ActionNotKnownException();
+        }
+    }
+
+    private static Action it(String name) throws ActionNotKnownException {
         try {
             return ITAction.valueOf(name.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new ActionNotKnownException();
         }
     }
 }

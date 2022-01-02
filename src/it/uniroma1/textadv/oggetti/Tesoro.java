@@ -30,4 +30,9 @@ public class Tesoro extends Oggetto implements Storable, Subject {
             o.update();
         }
     }
+
+    @Override
+    public boolean hasObservers() {
+        return observers.size() > 0;
+    }
 }

@@ -25,7 +25,7 @@ public class Venditore extends Personaggio implements Observer {
 
 	@Override
 	public void update() {
-		System.out.println("Hey! prima dovresti pagare...");
+		System.out.println("\n" + getNome() + ": 'Hey! prima dovresti pagare...'");
 	}
 	
 	@Override
@@ -40,7 +40,7 @@ public class Venditore extends Personaggio implements Observer {
 
 	@Override
 	public String parla() {
-		return "Salve! Cosa posso fare per lei?";
+		return "Benvenuto nella mia ferramenta!";
 	}
 
 	@Override
