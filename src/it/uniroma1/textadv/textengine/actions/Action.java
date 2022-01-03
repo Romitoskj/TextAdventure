@@ -7,10 +7,8 @@ import it.uniroma1.textadv.Storable;
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.links.Link;
-import it.uniroma1.textadv.oggetti.Breakable;
-import it.uniroma1.textadv.oggetti.Container;
-import it.uniroma1.textadv.oggetti.Oggetto;
-import it.uniroma1.textadv.oggetti.Opener;
+import it.uniroma1.textadv.links.Teletrasporto;
+import it.uniroma1.textadv.oggetti.*;
 import it.uniroma1.textadv.personaggi.Animal;
 import it.uniroma1.textadv.personaggi.Personaggio;
 import it.uniroma1.textadv.textengine.languages.Language;
@@ -49,16 +47,17 @@ public interface Action {
         return "Arrivederci!";
     }
 
+    // TODO look nell'inventario
     static String look(List<String> args, Language language) {
         if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
         if (args.size() > 0) {
             try {
-                return getInstance().searchItem(args.get(0)).toString() + ".";
+                return getInstance().searchItem(args.get(0)).getDescription(language) + ".";
             } catch (ItemNotPresentException e) {
                 return "In questa stanza non c'è nulla del genere.";
             }
         }
-        return getInstance().getPosizione().toString();
+        return getInstance().getPosizione().getDescription(language);
     }
 
     static String inventory(List<String> args, Language language) {
@@ -84,8 +83,8 @@ public interface Action {
                 return "Non c'è nessun passaggio chiamato così.";
             }
         }
-        if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome();
-        return "Il passaggio è chiuso.";
+        if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome() + ".";
+        return "Il passaggio " + link.getNome() + " è chiuso.";
     }
 
     static String enter(List<String> args, Language language) {
@@ -94,7 +93,7 @@ public interface Action {
         Link link;
         try {
             link = getInstance().searchLink(args.get(0));
-            if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome();
+            if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome() + ".";
             return "Il passaggio è chiuso.";
         } catch (ItemNotPresentException e) {
             return "Non c'è nessun passaggio chiamato così.";
@@ -105,9 +104,10 @@ public interface Action {
         if (args.size() == 0) return "Devi specificare cosa vuoi prendere.";
         if (args.size() > 2) return "Devi specificare massimo due argomenti.";
         String name = args.get(0);
-        if (name.equalsIgnoreCase("navetta")) return enter(args, language);
         if (args.size() > 1) return collectFrom(name, args.get(1), language);
         try {
+            Item item = getInstance().searchItem(name);
+            if (item instanceof Link) return enter(args, language);
             if (!getInstance().takeFromRoom(name)) return "Non puoi prenderlo...";
             return "Oggetto aggiunto all'inventario!";
         } catch (ItemNotPresentException e) {
@@ -136,11 +136,10 @@ public interface Action {
     }
 
     private static String collectFromContainer(String name, Container container, Language language) {
-        if (!container.isOpen()) return container + " è chiuso.";
+        if (!container.isOpen()) return container + " è chiuso."; // TODO acceso se camino
         try {
-            Storable toStore = container.removeContent(name);
+            Storable toStore = container.takeContent(name);
             if(toStore != null) getInstance().store(toStore);
-            else return "Non mi spiego sta roba cazzo";
             return "Oggetto aggiunto all'inventario!";
         } catch (ItemNotPresentException e) {
             return container.getNome() + " non contiene " + name + ".";
@@ -189,11 +188,11 @@ public interface Action {
             if (!toOpen.isUnlocked()) return "Non si " + (breakable ? "rompe" : "apre") + " con quest'oggetto...";
         } else if (args.size() > 1) return "Non è bloccato, " + (breakable ? "rompilo" : "aprilo") + " e basta!";
         toOpen.open();
-        return "Fatto!";
+        return "Fatto!"; // TODO sostituire con stringa migliore
     }
 
     static String breakItem(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare cosa vuoi aprire.";
+        if (args.size() == 0) return "Devi specificare cosa vuoi rompere.";
         if (args.size() > 2)
             return "Devi specificare solo due oggetti, uno da rompere e uno con cui rompere il primo.";
         try {
@@ -210,7 +209,7 @@ public interface Action {
         if (args.size() > 1) return "Puoi parlare solo ad un personaggio per volta.";
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
-            return personaggio.getNome() + ":'" + personaggio.parla() + "'";
+            return personaggio.getNome() + ":'" + personaggio.parla(language) + "'";
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -222,7 +221,7 @@ public interface Action {
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
             if (!(personaggio instanceof Animal)) return "Non è carino accarezzare una persona che non conosci!";
-            return personaggio.getNome() + ":'" + personaggio.parla() + "'";
+            return personaggio.getNome() + ":'" + personaggio.parla(language) + "'";
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -245,8 +244,46 @@ public interface Action {
         }
     }
 
-    // TODO USE
     static String use(List<String> args, Language language) {
-        return "";
+        if (args.size() == 0) return "Devi specificare cosa vuoi usare.";
+        Item item , link;
+        try {
+            item = getInstance().getInventoryItem(args.get(0));
+            if (item instanceof Opener) {
+                if (args.size() < 2) return "Devi specificare su cosa usare l'oggetto.";
+                if (item instanceof Secchio) {
+                    Secchio secchio = (Secchio) item;
+                    if (!secchio.isPieno()) return riempi(secchio, args.get(1), language); // TODO e secondo oggetto !instanceof Camino
+                }
+                link = getInstance().searchItem(args.get(1));
+                if (link instanceof Teletrasporto) {
+                    Teletrasporto t = (Teletrasporto) link;
+                    String open = open(List.of(args.get(1), args.get(0)), language);
+                    if (t.isOpen()) return go(List.of(t.getNome()), language);
+                    return open;
+                }
+                return open(List.of(args.get(1), args.get(0)), language);
+            }
+            return "Sembra non faccia nulla...";
+        } catch (ItemNotPresentException e) {
+            try {
+                getInstance().searchLink(args.get(0));
+                return go(args, language);
+            } catch (ItemNotPresentException ex) {
+                return "Non hai nulla del genere e non c'è un passaggio chiamato così...";
+            }
+        }
     }
+
+    private static String riempi(Secchio s, String arg, Language language) {
+        try {
+            s.riempi((Pozzo) getInstance().searchItem(arg));
+            return "Secchio riempito!";
+        } catch (ItemNotPresentException e) {
+            return "In questa stanza non c'è nulla del genere...";
+        } catch (ClassCastException e) {
+            return "Puoi riempire il secchio solo al pozzo...";
+        }
+    }
+
 }

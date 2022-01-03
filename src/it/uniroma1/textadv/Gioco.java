@@ -9,15 +9,19 @@ import it.uniroma1.textadv.textengine.languages.Language;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.LanguageFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 public class Gioco implements Observer {
 
 	private LanguageFactory lanFactory = EnglishAndItalian.getFactory();
 
-	private String win = "> ";
+	private boolean win;
 
 
 	public void play(Mondo world) {
@@ -41,10 +45,12 @@ public class Gioco implements Observer {
 		System.out.println(world);
 		System.out.println(Command.getLanguage().getAnswer("start"));
 		do {
-			System.out.print(win);
+			if (win) System.out.println("\n" + Command.getLanguage().getAnswer("win"));
+			System.out.print("> ");
 			input = scanner.nextLine();
 			try {
 				command = new Command(input);
+				System.out.println("*".repeat(40) + " " + command);
 				output = command.execute();
 			} catch (ActionNotKnownException e) {
 				output = Command.getLanguage().getAnswer("not_found_action");
@@ -53,9 +59,29 @@ public class Gioco implements Observer {
 		} while (!input.equalsIgnoreCase("esci") && !input.equalsIgnoreCase("quit"));
 	}
 
-	public void play(Mondo world, Path scriptFF) {
+	public void play(Mondo world, Path scriptFF) throws IOException {
 		Giocatore.getInstance().registraObserver(this);
 		localizza(EnglishAndItalian.IT);
+		Iterator<String> lines = Files.readAllLines(scriptFF).iterator();
+		String output, line;
+		Command command;
+		int k;
+
+		do {
+			if (win) System.out.println("\n" + Command.getLanguage().getAnswer("win"));
+			System.out.print("> ");
+			try {
+				line = lines.next();
+				k = line.indexOf("//");
+				if (k >= 0) line = line.substring(0, k); // rimuove commenti
+				command = new Command(line.strip());
+				System.out.println(command);
+				output = command.execute();
+			} catch (ActionNotKnownException e) {
+				output = Command.getLanguage().getAnswer("not_found_action");
+			}
+			System.out.println("\n" + output);
+		} while (lines.hasNext());
 	}
 
 	public void setLanguageFactory(LanguageFactory lanFactory) {
@@ -68,6 +94,6 @@ public class Gioco implements Observer {
 
 	@Override
 	public void update() {
-		win = "\n\n" + Command.getLanguage().getAnswer("win") + "\t" + win;
+		win = true;
 	}
 }

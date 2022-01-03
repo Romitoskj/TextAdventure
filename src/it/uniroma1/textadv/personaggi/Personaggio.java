@@ -6,6 +6,7 @@ import java.util.Map;
 import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.Storable;
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 public abstract class Personaggio implements Item {
 
@@ -25,6 +26,11 @@ public abstract class Personaggio implements Item {
 	}
 
 	public String getNome() {
+		return nome;
+	}
+
+	@Override
+	public String getDescription(Language language) {
 		return nome;
 	}
 
@@ -49,15 +55,7 @@ public abstract class Personaggio implements Item {
 		p.store(item);
 	}
 
-	@Override
-	public String toString() {
-		return "{" +
-				"nome='" + nome + '\'' +
-				", inventario=" + inventario +
-				'}';
-	}
-
-	public String parla() {
+	public String parla(Language language) {
 		return nome;
 	}
 }

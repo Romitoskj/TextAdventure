@@ -43,4 +43,8 @@ public class Secchio extends Opener implements Storable, Subject {
     public void riempi(Pozzo p) {
         pieno = true;
     }
+
+    public void svuota() {
+        pieno = false;
+    }
 }

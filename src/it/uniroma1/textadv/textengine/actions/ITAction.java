@@ -36,7 +36,7 @@ public enum ITAction implements Action {
 
     PARLA(Action::speak, "\t\t\tUsalo per dialogare con altri personaggi."),
 
-    ACCAREZZA(Action::speak, "\t\tUsalo per accarezzare un animale.");
+    ACCAREZZA(Action::pet, "\t\tUsalo per accarezzare un animale.");
 
     private final String DESCRIPTION;
 

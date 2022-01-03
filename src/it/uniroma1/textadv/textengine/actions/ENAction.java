@@ -35,7 +35,7 @@ public enum ENAction implements Action {
 
     SPEAK(Action::speak, "\t\t\tSpeaks with another characters."),
 
-    PET(Action::speak, "\t\t\t\tPets an animal.");
+    PET(Action::pet, "\t\t\t\tPets an animal.");
 
     private final String DESCRIPTION;
 

@@ -2,6 +2,8 @@ package it.uniroma1.textadv.oggetti;
 
 import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.links.Link;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 public abstract class Blocker extends Opener implements Lockable {
 
@@ -60,7 +62,8 @@ public abstract class Blocker extends Opener implements Lockable {
     }
 
     @Override
-    public String toString() {
-        return nome + (isOpen()? "" : " che blocca " + getToOpen());
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return nome + (isOpen()? "" : " che blocca " + getToOpen());
+        else return nome + (isOpen()? "" : " that blocks " + getToOpen());
     }
 }

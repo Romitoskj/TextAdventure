@@ -13,15 +13,16 @@ public class Command {
 
     private static Language language;
 
+    private static ActionFactory factory;
+
     private final Action action;
 
     private final List<String> arguments;
 
     public Command(String input) throws ActionNotKnownException {
-        ActionFactory FACTORY = language.getActionFactory();
         // String[] words = input.split("\\s+", 2);
         String[] words = input.split("-+");
-        action = FACTORY.getAction(words[0]);
+        action = factory.getAction(words[0]);
         arguments = Arrays.stream(words) // TODO split riconoscendo argomenti
                 .skip(1)
                 .filter(w -> !language.getSTOP_WORDS().contains(w.toLowerCase()))
@@ -34,15 +35,19 @@ public class Command {
 
     public static void setLanguage(Language language) {
         Command.language = language;
+        setFactory(language.getActionFactory());
+    }
+
+    public static void setFactory(ActionFactory factory) {
+        Command.factory = factory;
     }
 
     @Override
     public String toString() {
-        return "*".repeat(40) + " " + action + " arguments=" + arguments;
+        return action + (arguments.size() > 0? " arguments=" + arguments : "");
     }
 
     public String execute() {
-        System.out.println(this);
         return action.execute(arguments);
     }
 }

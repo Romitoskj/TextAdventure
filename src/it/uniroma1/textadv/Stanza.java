@@ -5,6 +5,8 @@ import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Container;
 import it.uniroma1.textadv.oggetti.Oggetto;
 import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -126,39 +128,43 @@ public class Stanza implements Item {
         return nome;
     }
 
-    private String mapList(Map<String, ? extends Item> m) {
+    @Override
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return nome + ": " + descrizione + "." +
+                (oggetti.isEmpty() ? "" : "\nAll'interno ci sono degli oggetti: " + mapList(oggetti, language)) +
+                (personaggi.isEmpty() ? "" : "\nC'è qualcuno qui dentro: " + mapList(personaggi, language)) +
+                "\nPer uscire da questa stanza puoi sfruttare i seguenti passaggi: " + linkList(language);
+        else return nome + ": " + descrizione + "." +
+                (oggetti.isEmpty() ? "" : "\nInside the room there are some objects: " + mapList(oggetti, language)) +
+                (personaggi.isEmpty() ? "" : "\nThere is someone in here: " + mapList(personaggi, language)) +
+                "\nYou can use the following passages to exit from this room: " + linkList(language);
+    }
+
+    private String mapList(Map<String, ? extends Item> m, Language language) {
         StringBuilder sb = new StringBuilder();
         int k = 0;
         Set<String> keySet = m.keySet();
         for (String s : keySet) {
-            sb.append(m.get(s).toString())
-                    .append((k == keySet.size() - 2) ? " e " : ", ");
+            sb.append(m.get(s).getDescription(language))
+                    .append((k == keySet.size() - 2) ? (language.equals(EnglishAndItalian.IT)? " e " : " and ") : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
     }
 
-    private String linkList() {
+    private String linkList(Language language) {
         StringBuilder sb = new StringBuilder();
         int k = 0;
         Set<Direzione> l = links.keySet();
         for (Direzione d : l) {
-            sb.append("a ")
-                    .append(d.toString().toLowerCase())
+            sb.append((language.equals(EnglishAndItalian.IT)?"a " : ""))
+                    .append(d.get(language))
                     .append(" ")
                     .append(links.get(d).getNome())
-                    .append((k == l.size() - 2) ? " e " : ", ");
+                    .append((k == l.size() - 2) ? (language.equals(EnglishAndItalian.IT)? " e " : " and ") : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
-    }
-
-    @Override
-    public String toString() {
-        return nome + ": " + descrizione + "." +
-                (oggetti.isEmpty() ? "" : "\nAll'interno ci sono degli oggetti: " + mapList(oggetti)) +
-                (personaggi.isEmpty() ? "" : "\nC'è qualcuno qui: " + mapList(personaggi)) +
-                "\nPer uscire da questa stanza puoi sfruttare i seguenti passaggi: " + linkList();
     }
 
     public Link getLink(Direzione dir) throws ItemNotPresentException {
@@ -186,8 +192,9 @@ public class Stanza implements Item {
             for (Oggetto o : oggetti.values()) {
                 if (o instanceof Container) {
                     try {
-                        item = ((Container) o).removeContent(nome);
+                        item = ((Container) o).getContent(nome);
                     } catch (ItemNotPresentException ignored) {
+                        // Si devono controllare gli altri container.
                     }
                 }
             }
@@ -199,7 +206,16 @@ public class Stanza implements Item {
     }
 
     public void remove(String nome) {
-        oggetti.remove(nome);
-        personaggi.remove(nome);
+        Item item = personaggi.remove(nome);
+        if (item == null) oggetti.remove(nome);
+        if (item == null) {
+            for (Oggetto o : oggetti.values()) {
+                if (o instanceof Container) {
+                    try {
+                        ((Container) o).takeContent(nome);
+                    } catch (ItemNotPresentException ignored) {}
+                }
+            }
+        }
     }
 }

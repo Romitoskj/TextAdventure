@@ -3,6 +3,8 @@ package it.uniroma1.textadv.oggetti;
 import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.Storable;
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 public abstract class Container extends Oggetto implements Lockable {
 
@@ -32,13 +34,15 @@ public abstract class Container extends Oggetto implements Lockable {
         return content == null;
     }
 
-    public Storable removeContent(String name) throws ItemNotPresentException {
-        if (isEmpty() || !(contentName.equalsIgnoreCase(name))) throw new ItemNotPresentException();
-        Storable res = null;
-        if (isOpen()) {
-            res = content;
-            content = null;
-        }
+    public Storable getContent(String name) throws ItemNotPresentException {
+        if (!isOpen() || isEmpty() || !(contentName.equalsIgnoreCase(name))) throw new ItemNotPresentException();
+        return content;
+    }
+
+    public Storable takeContent(String name) throws ItemNotPresentException {
+        if (!isOpen() || isEmpty() || !(contentName.equalsIgnoreCase(name))) throw new ItemNotPresentException();
+        Storable res = content;
+        content = null;
         return res;
     }
 
@@ -76,7 +80,8 @@ public abstract class Container extends Oggetto implements Lockable {
     }
 
     @Override
-    public String toString() {
-        return nome + (isOpen()? (content != null? " che contiene " + content : " che non contiene più nulla") : "");
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return nome + (isOpen()? (content != null? " che contiene " + content : " che non contiene più nulla") : "");
+        else return nome + (isOpen()? (content != null? " that contains " + content : " that does not contain anything") : "");
     }
 }

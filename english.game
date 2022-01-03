@@ -1,0 +1,109 @@
+[world:Zak's world]
+description	Welcome in the world where Zak's adventures happen!
+start	Zak's room
+
+[room:Zak's room]
+description	Zak's bedroom
+objects	desk, screw
+links	E:Zak's living room,S:trapdoor
+
+[room:Zak's living room]
+description	Zak's living room
+objects	moneybox
+characters	bob
+links	O:Zak's room,S:front door,N:closet door
+
+[room:closet]
+description	Zak's house closet
+objects	hammer,screwdriver
+links	S:closet door
+
+[room:outside]
+description	area outside Zak's house where the bus stop is
+objects	well
+links	N:front door,O:shuttle
+
+[room:store]
+description	hardware store
+objects	clippers, bucket
+characters	Tom
+links	E:shuttle
+
+[room:secret room]
+description	super secret room under Zak's house
+objects	sparkling closet
+links	N:trapdoor,O:great door,E:teleport
+
+[room:cobalt room]
+description	room that contain a blue gem
+objects	blue gem
+links	E:great door
+
+[room:tiny mysterious room]
+description	a tiny empty and mysterious room
+objects	fireplace
+links	N:flame red room,O:teleport
+
+[room:flame red room]
+description	a flame red room
+objects	drawer
+links	E:red door,S:tiny mysterious room
+
+[room:green blue room]
+description	room with three doors and a strange cat
+characters	neo
+links	N:blue door,S:green door,O:red door
+
+[room:emerald room]
+description	room with a green gem
+objects	green gem
+characters
+links	S:blue door
+
+[room:treasure room]
+description	finally the room where the great treasure is
+objects	treasure
+characters	treasure watcher
+links	N:green door
+
+
+[links]
+trapdoor	Botola	Zak's room	secret room
+front door	Porta	Zak's living room	outside
+closet door	Porta	Zak's living room	closet
+shuttle	Bus	outside	store
+teleport	Teletrasporto	secrete room	tiny mysterious room
+great door	Porta	secrete room	cobalt room
+red door	Porta	flame red room	green blue room
+blue door	Porta	green blue room	emerald room
+green door	Porta	green blue room	treasure room
+
+[objects]
+desk	Scrivania	key
+screw	Vite	trapdoor
+key	Chiave	closet room
+moneybox	Salvadanaio	money
+money	Soldi
+hammer	Martello
+screwdriver	Cacciavite
+clippers	Tronchesi	sparkling closet
+sparkling closet	Armadio	teleport key
+teleport key	Chiave	teleport
+well	Pozzo
+bucket	Secchio // inizialmente vuoto
+blue gem	Chiave	blue door
+red gem	Chiave	red room
+green gem	Chiave	green room
+great key	Chiave	great room
+fireplace	Camino	red gem // inizialmente acceso
+drawer	Cassetto	great key
+treasure	Tesoro
+
+[characters]
+bob	Cane
+Tom	Venditore	bucket	clippers
+neo	Gatto
+treasure watcher	Guardiano	treasure	neo
+
+[player]
+Zak	Giocatore

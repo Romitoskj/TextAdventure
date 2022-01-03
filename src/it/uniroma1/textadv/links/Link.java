@@ -3,6 +3,8 @@ package it.uniroma1.textadv.links;
 import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.oggetti.Opener;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,12 +57,6 @@ public class Link implements Item, Lockable {
 	}
 
 	@Override
-	public String toString() {
-		return "Il passaggio " + nome + " è " +
-				(isOpen()? "aperto" : "chiuso");
-	}
-
-	@Override
 	public boolean isOpen() {
 		return !closed;
 	}
@@ -70,5 +66,11 @@ public class Link implements Item, Lockable {
 		if (isUnlocked()) {
 			closed = false;
 		}
+	}
+
+	@Override
+	public String getDescription(Language language) {
+		if (language.equals(EnglishAndItalian.IT)) return "Il passaggio " + nome + " è " + (isOpen()? "aperto" : "chiuso");
+		else return "The passage " + nome + " is " + (isOpen()? "open" : "closed");
 	}
 }

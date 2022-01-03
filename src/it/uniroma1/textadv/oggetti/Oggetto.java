@@ -2,6 +2,7 @@ package it.uniroma1.textadv.oggetti;
 
 
 import it.uniroma1.textadv.Item;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 public abstract class Oggetto implements Item {
 
@@ -18,6 +19,11 @@ public abstract class Oggetto implements Item {
 
 	@Override
 	public String toString() {
+		return getNome();
+	}
+
+	@Override
+	public String getDescription(Language language) {
 		return getNome();
 	}
 }

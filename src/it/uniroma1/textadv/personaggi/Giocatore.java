@@ -43,6 +43,7 @@ public class Giocatore extends Personaggio implements Subject{
         return posizione;
     }
 
+    // TODO sistemare con get descrition (oggetti possono avere stati diversi es. secchio)
     public String getInventario() {
         return inventario.keySet().toString();
     }
