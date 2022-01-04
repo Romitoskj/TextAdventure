@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 
+import it.uniroma1.textadv.exceptions.RoomWithoutDescriptionException;
 import it.uniroma1.textadv.exceptions.WorldNotCreatedException;
 import it.uniroma1.textadv.exceptions.WronglyFormattedFileException;
 import it.uniroma1.textadv.links.Link;
@@ -67,42 +68,6 @@ public class Mondo {
     private Mondo(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    /**
-     * Restituisce il dizionario degli oggetti.
-     *
-     * @return dizionario degli oggetti.
-     */
-    Map<String, Oggetto> getOggetti() {
-        return OGGETTI;
-    }
-
-    /**
-     * Restituisce il dizionario dei personaggi.
-     *
-     * @return dizionario dei personaggi.
-     */
-    Map<String, Personaggio> getPersonaggi() {
-        return PERSONAGGI;
-    }
-
-    /**
-     * Restituisce il dizionario delle stanze.
-     *
-     * @return dizionario delle stanze.
-     */
-    Map<String, Stanza> getStanze() {
-        return STANZE;
-    }
-
-    /**
-     * Restituisce il dizionario dei link.
-     *
-     * @return dizionario dei link.
-     */
-    Map<String, Link> getLinks() {
-        return LINKS;
     }
 
     /**
@@ -366,6 +331,7 @@ public class Mondo {
                     break;
                 }
             }
+            if (builder == null) throw new RoomWithoutDescriptionException();
             for (String line : text) {
                 lineText = line.split("\\t");
                 if (lineText.length > 1) {

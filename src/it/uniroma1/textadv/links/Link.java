@@ -12,7 +12,7 @@ import java.util.Set;
 public class Link implements Item, Lockable {
 
 	private final String nome;
-	private final Set<String> stanze = new HashSet<>();
+	private final Set<String> stanze = new HashSet<>(); // TODO sostituire con set di stanze effettive e inizializzarli dopo aver creato stanze -> modificare goThrough
 	private boolean closed;
 	private boolean locked;
 
