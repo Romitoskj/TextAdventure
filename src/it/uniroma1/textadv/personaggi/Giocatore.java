@@ -1,12 +1,11 @@
 package it.uniroma1.textadv.personaggi;
 
 import it.uniroma1.textadv.*;
-import it.uniroma1.textadv.exceptions.AlreadyCreatedPlayerException;
-import it.uniroma1.textadv.exceptions.ItemNotPresentException;
-import it.uniroma1.textadv.exceptions.PlayerNotInitializedException;
+import it.uniroma1.textadv.exceptions.*;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Subject;
 import it.uniroma1.textadv.oggetti.Tesoro;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,10 @@ public class Giocatore extends Personaggio implements Subject{
         return instance;
     }
 
-    public static void init(String nome, Stanza start) throws AlreadyCreatedPlayerException {
+    public static void init(String nome, Stanza start) {
         if (instance != null) throw new AlreadyCreatedPlayerException();
+        if (nome == null || nome.equals("")) throw new UnnamedPlayerException();
+        if (start == null) throw new StartNotPresentException();
         instance = new Giocatore(nome, start);
     }
 
@@ -43,9 +44,15 @@ public class Giocatore extends Personaggio implements Subject{
         return posizione;
     }
 
-    // TODO sistemare con get descrition (oggetti possono avere stati diversi es. secchio)
-    public String getInventario() {
-        return inventario.keySet().toString();
+    public String getInventario(Language l) {
+        StringBuilder sb = new StringBuilder();
+        for (Storable s :
+                inventario.values()) {
+            sb.append("\t- ")
+                    .append(s.getDescription(l))
+                    .append("\n");
+        }
+        return sb.toString();
     }
 
 

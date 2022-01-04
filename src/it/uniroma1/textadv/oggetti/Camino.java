@@ -10,7 +10,7 @@ public class Camino extends Container {
     }
 
     @Override
-    public void unlock(Opener opener) { // TODO dire che va riempito se vuoto (ora "non si apre con quest'oggetto")
+    public void unlock(Opener opener) {
         if (opener instanceof Secchio) {
             Secchio s = (Secchio) opener;
             if (s.isPieno()) {
@@ -23,8 +23,8 @@ public class Camino extends Container {
     @Override
     public String getDescription(Language language) {
         if (language.equals(EnglishAndItalian.IT))
-            return nome + (isOpen() ? " spento" : " acceso") + (isEmpty() ? " che non contiene più nulla" : " che contiene " + getContentName());
+            return nome + (isOpen() ? " spento" + (isEmpty() ? " che non contiene più nulla" : " che contiene " + getContentName()): " acceso" + (isEmpty()? "": " (sembra che fra le fiamme ci sia qualcosa)"));
         else
-            return (isOpen() ? "Empty " : "Lit ") + nome + (isEmpty() ? " that does not contain anything" : " that contains " + getContentName());
-    } // TODO deve dire che non può prenderlo se è chiuso non che non lo trova
+            return (isOpen() ? "Empty " + nome + (isEmpty() ? " that does not contain anything" : " that contains " + getContentName()) : "Lit " + nome + (isEmpty()? "": " (it seems that there is something into the flames)"));
+    }
 }

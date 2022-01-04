@@ -47,7 +47,6 @@ public interface Action {
         return "Arrivederci!";
     }
 
-    // TODO look nell'inventario
     static String look(List<String> args, Language language) {
         if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
         if (args.size() > 0) {
@@ -62,7 +61,7 @@ public interface Action {
 
     static String inventory(List<String> args, Language language) {
         if (args.size() > 0) return "Questo comando non accetta argomenti.";
-        return getInstance().getInventario();
+        return getInstance().getInventario(language);
     }
 
     static String go(List<String> args, Language language) {
@@ -108,8 +107,9 @@ public interface Action {
         try {
             Item item = getInstance().searchItem(name);
             if (item instanceof Link) return enter(args, language);
-            if (!getInstance().takeFromRoom(name)) return "Non puoi prenderlo...";
-            return "Oggetto aggiunto all'inventario!";
+            if (getInstance().takeFromRoom(name)) return "Oggetto aggiunto all'inventario!";
+            return "Non puoi prenderlo...";
+
         } catch (ItemNotPresentException e) {
             return "In questa stanza non c'è nulla del genere...";
         }
@@ -136,10 +136,11 @@ public interface Action {
     }
 
     private static String collectFromContainer(String name, Container container, Language language) {
-        if (!container.isOpen()) return container + " è chiuso."; // TODO acceso se camino
+        if (!container.isOpen())
+            return container + " è " + (container instanceof Camino ? "acceso." : "chiuso.");
         try {
             Storable toStore = container.takeContent(name);
-            if(toStore != null) getInstance().store(toStore);
+            if (toStore != null) getInstance().store(toStore);
             return "Oggetto aggiunto all'inventario!";
         } catch (ItemNotPresentException e) {
             return container.getNome() + " non contiene " + name + ".";
@@ -188,7 +189,7 @@ public interface Action {
             if (!toOpen.isUnlocked()) return "Non si " + (breakable ? "rompe" : "apre") + " con quest'oggetto...";
         } else if (args.size() > 1) return "Non è bloccato, " + (breakable ? "rompilo" : "aprilo") + " e basta!";
         toOpen.open();
-        return "Fatto!"; // TODO sostituire con stringa migliore
+        return "Aperto!";
     }
 
     static String breakItem(List<String> args, Language language) {
@@ -196,7 +197,7 @@ public interface Action {
         if (args.size() > 2)
             return "Devi specificare solo due oggetti, uno da rompere e uno con cui rompere il primo.";
         try {
-            Oggetto o =  (Oggetto) getInstance().searchItem(args.get(0));
+            Oggetto o = (Oggetto) getInstance().searchItem(args.get(0));
             if (!(o instanceof Breakable)) return args.get(0) + " non può essere rotto.";
             return open(args, language);
         } catch (ClassCastException | ItemNotPresentException e) {
@@ -246,16 +247,21 @@ public interface Action {
 
     static String use(List<String> args, Language language) {
         if (args.size() == 0) return "Devi specificare cosa vuoi usare.";
-        Item item , link;
+        Item item, link;
         try {
             item = getInstance().getInventoryItem(args.get(0));
             if (item instanceof Opener) {
                 if (args.size() < 2) return "Devi specificare su cosa usare l'oggetto.";
+                try {
+                    link = getInstance().searchItem(args.get(1));
+                } catch (ItemNotPresentException e) {
+                    return "Non c'è nulla chiamato così su cui usare l'oggetto.";
+                }
                 if (item instanceof Secchio) {
                     Secchio secchio = (Secchio) item;
-                    if (!secchio.isPieno()) return riempi(secchio, args.get(1), language); // TODO e secondo oggetto !instanceof Camino
+                    if (!secchio.isPieno() && !(link instanceof Lockable))
+                        return riempi(secchio, args.get(1), language);
                 }
-                link = getInstance().searchItem(args.get(1));
                 if (link instanceof Teletrasporto) {
                     Teletrasporto t = (Teletrasporto) link;
                     String open = open(List.of(args.get(1), args.get(0)), language);

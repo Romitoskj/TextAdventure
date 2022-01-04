@@ -2,6 +2,8 @@ package it.uniroma1.textadv.oggetti;
 
 import it.uniroma1.textadv.Storable;
 import it.uniroma1.textadv.personaggi.Observer;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
+import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,5 +48,11 @@ public class Secchio extends Opener implements Storable, Subject {
 
     public void svuota() {
         pieno = false;
+    }
+
+    @Override
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return nome + (isPieno()? " pieno" : " vuoto");
+        return nome + (isPieno()? " full" : " empty");
     }
 }
