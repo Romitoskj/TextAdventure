@@ -2,6 +2,7 @@ package it.uniroma1.textadv.personaggi;
 
 import it.uniroma1.textadv.Mondo;
 import it.uniroma1.textadv.Storable;
+import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.oggetti.Subject;
 import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
@@ -23,10 +24,10 @@ public class Guardiano extends Personaggio implements Observer {
 
 	private static final String EN_NOT = "What a beautiful kitty!";
 
-	public Guardiano(String nome, String... params) {
+	public Guardiano(String nome, String... params) throws ItemNotPresentException {
 		super(nome);
 		needed = params[1];
-		watched = (Subject) Mondo.getInstance().getOggetto(params[0]);
+		watched = (Subject) Mondo.getInstance().getItem(params[0]);
 		watched.registraObserver(this);
 	}
 

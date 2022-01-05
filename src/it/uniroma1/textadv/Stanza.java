@@ -10,6 +10,7 @@ import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -140,6 +141,19 @@ public class Stanza implements Item {
                 "\nYou can use the following passages to exit from this room: " + linkList(language);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Stanza)) return false;
+        Stanza stanza = (Stanza) o;
+        return getNome().equals(stanza.getNome());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNome());
+    }
+
     private String mapList(Map<String, ? extends Item> m, Language language) {
         StringBuilder sb = new StringBuilder();
         int k = 0;
@@ -213,7 +227,9 @@ public class Stanza implements Item {
                 if (o instanceof Container) {
                     try {
                         ((Container) o).takeContent(nome);
-                    } catch (ItemNotPresentException ignored) {}
+                    } catch (ItemNotPresentException ignored) {
+                        // Si devono controllare gli altri container.
+                    }
                 }
             }
         }

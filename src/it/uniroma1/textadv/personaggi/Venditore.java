@@ -2,6 +2,7 @@ package it.uniroma1.textadv.personaggi;
 
 import it.uniroma1.textadv.Mondo;
 import it.uniroma1.textadv.Storable;
+import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.oggetti.Subject;
 import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
@@ -16,14 +17,18 @@ public class Venditore extends Personaggio implements Observer {
 
 	private final String needed = "soldi";
 
-	public Venditore(String nome, String... toSell) {
+	public Venditore(String nome, String... toSell) throws ItemNotPresentException {
 		super(nome);
 		Subject item;
 		for (String name : toSell) {
-			item = (Subject) Mondo.getInstance().getOggetto(name);
+			item = (Subject) Mondo.getInstance().getItem(name);
 			this.toSell.add(item);
 			item.registraObserver(this);
 		}
+	}
+
+	public String getNeeded() {
+		return needed;
 	}
 
 	@Override
@@ -38,6 +43,11 @@ public class Venditore extends Personaggio implements Observer {
 		if (toStore.getNome().equalsIgnoreCase(needed)) {
 			for (Subject item: toSell) {
 				item.rimuoviObserver(this);
+				try {
+					Giocatore.getInstance().takeFromRoom(item.getNome());
+				} catch (ItemNotPresentException ignored) {
+					// se ha dato cosa vuole è per forza nella stessa stanza
+				}
 			}
 		}
 		super.store(toStore);

@@ -5,9 +5,10 @@ import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 
+
 public abstract class Blocker extends Opener implements Lockable {
 
-    private Link blocked;
+    private Lockable blocked;
 
     private boolean closed = true;
 
@@ -18,7 +19,7 @@ public abstract class Blocker extends Opener implements Lockable {
         this.locked = locked;
     }
 
-    public void block(Link blocked) {
+    public void block(Lockable blocked) {
         this.blocked = blocked;
         blocked.lock(this);
     }

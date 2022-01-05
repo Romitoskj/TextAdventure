@@ -2,6 +2,8 @@ package it.uniroma1.textadv.links;
 
 import it.uniroma1.textadv.Lockable;
 import it.uniroma1.textadv.Item;
+import it.uniroma1.textadv.Stanza;
+import it.uniroma1.textadv.exceptions.LinkAlreadyInitializedException;
 import it.uniroma1.textadv.oggetti.Opener;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
@@ -12,22 +14,38 @@ import java.util.Set;
 public class Link implements Item, Lockable {
 
 	private final String nome;
-	private final Set<String> stanze = new HashSet<>(); // TODO sostituire con set di stanze effettive e inizializzarli dopo aver creato stanze -> modificare goThrough
+	private final String STANZA1;
+	private final String STANZA2;
+	private Set<Stanza> stanze;
 	private boolean closed;
 	private boolean locked;
 
 	public Link(String nome, String stanza1, String stanza2) {
 		this.nome = nome;
-		stanze.add(stanza1);
-		stanze.add(stanza2);
+		STANZA1 = stanza1;
+		STANZA2 = stanza2;
 	}
+
+	public String getSTANZA1() {
+		return STANZA1;
+	}
+
+	public String getSTANZA2() {
+		return STANZA2;
+	}
+
 	public Link(String nome, String stanza1, String stanza2, boolean closed) {
 		this(nome, stanza1, stanza2);
 		this.closed = closed;
 	}
 
-	public Set<String> getStanze() {
+	public Set<Stanza> getStanze() {
 		return new HashSet<>(stanze);
+	}
+
+	public void init(Stanza s1, Stanza s2) throws LinkAlreadyInitializedException {
+		if (stanze != null) throw new LinkAlreadyInitializedException();
+		stanze = Set.of(s1, s2);
 	}
 
 	@Override

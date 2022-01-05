@@ -58,9 +58,9 @@ public class Giocatore extends Personaggio implements Subject{
 
     public boolean goThrough(Link link) {
         if (link.isOpen()) {
-            Set<String> to = link.getStanze();
-            to.remove(posizione.getNome());
-            posizione = Mondo.getInstance().getStanza(to.iterator().next());
+            Set<Stanza> to = link.getStanze();
+            to.remove(posizione);
+            posizione = to.iterator().next();
             return true;
         } else
             return false;

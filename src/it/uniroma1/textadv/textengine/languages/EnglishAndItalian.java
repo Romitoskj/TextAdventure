@@ -21,19 +21,26 @@ public enum EnglishAndItalian implements Language {
                     entry("start", "You can write \"help\" in any moment if your struggle with the commands.\n" +
                             "Write \"look\" to look around the room and start the adventure!"),
                     entry("not_found_action", "Unrecognized action."),
-                    entry("win", "Well done! You win!\nWrite \"quit\" to quit the game.")
-            )),
+                    entry("wrong_args", "I don't know what you are talking about..."),
+                    entry("win", "Well done! You win!"),
+                    entry("end", "Write \"quit\" to quit the game.")
+            )
+    ),
 
     IT(ITAction.getFactory(),
-            Set.of("il", "lo", "la", "i", "gli", "le", "un", "uno", "una", /*"di", "del",*/ "dello", "della", "dei", "degli",
+            Set.of("il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "di", "del", "dello", "della", "dei", "degli",
             "delle", "a", "al", "allo", "alla", "ai", "agli", "alle", "da", "dal", "dallo", "dalla", "dai", "dagli",
             "dalle", "in", "nel", "nello", "nella", "nei", "negli", "nelle", "su", "sul", "sullo", "sulla", "sui",
-            "sugli", "sulle", "con", "dentro"), Map.ofEntries(
-            entry("start", "In ogni momento potrai scrivere \"aiuto\" se hai bisogno di una mano con i comandi.\n" +
-                    "Scrivi \"guarda\" per guardarti intorno e iniziare l'avventura!"),
-            entry("not_found_action", "Azione non riconosciuta."),
-            entry("win", "Congratulazioni! Hai vinto!\nScrivi \"esci\" per uscire dal gioco.")
-    ));
+            "sugli", "sulle", "con", "dentro"),
+            Map.ofEntries(
+                    entry("start", "In ogni momento potrai scrivere \"aiuto\" se hai bisogno di una mano con i comandi.\n" +
+                            "Scrivi \"guarda\" per guardarti intorno e iniziare l'avventura!"),
+                    entry("not_found_action", "Azione non riconosciuta."),
+                    entry("wrong_args", "Non so a cosa ti riferisci..."),
+                    entry("win", "Congratulazioni! Hai vinto!"),
+                    entry("end", "Scrivi \"esci\" per uscire dal gioco.")
+            )
+    );
 
     private final Set<String> STOP_WORDS;
 

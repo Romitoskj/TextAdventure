@@ -11,9 +11,12 @@ import it.uniroma1.textadv.links.Teletrasporto;
 import it.uniroma1.textadv.oggetti.*;
 import it.uniroma1.textadv.personaggi.Animal;
 import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.personaggi.Venditore;
+import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.List;
+import java.util.Objects;
 
 import static it.uniroma1.textadv.personaggi.Giocatore.getInstance;
 
@@ -25,7 +28,7 @@ public interface Action {
 
     static String help(List<String> args, Language language) {
         if (args.size() > 1) return "Questo comando accetta al massimo un argomento.";
-        ActionFactory actionFactory = language.getActionFactory();
+        ActionFactory actionFactory = Command.getFactory();
         if (args.size() == 1) {
             String actionName = args.get(0).toUpperCase();
             try {
@@ -189,7 +192,8 @@ public interface Action {
             if (!toOpen.isUnlocked()) return "Non si " + (breakable ? "rompe" : "apre") + " con quest'oggetto...";
         } else if (args.size() > 1) return "Non è bloccato, " + (breakable ? "rompilo" : "aprilo") + " e basta!";
         toOpen.open();
-        return "Aperto!";
+        if (toOpen instanceof Camino) return "Spento!";
+        return (breakable? "Rotto!" : "Aperto!");
     }
 
     static String breakItem(List<String> args, Language language) {
@@ -236,6 +240,9 @@ public interface Action {
             Personaggio p = (Personaggio) getInstance().searchItem(args.get(1));
             try {
                 getInstance().dai(itemName, p);
+                if (p instanceof Venditore) {
+                    if (itemName.equals(((Venditore) p).getNeeded())) return p.getNome() + " ti ha dato secchio e tronchesi.";
+                }
                 return itemName + " dato a " + p.getNome() + ".";
             } catch (ItemNotPresentException e) {
                 return "Non hai nulla del genere...";

@@ -8,9 +8,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 
-import it.uniroma1.textadv.exceptions.RoomWithoutDescriptionException;
-import it.uniroma1.textadv.exceptions.WorldNotCreatedException;
-import it.uniroma1.textadv.exceptions.WronglyFormattedFileException;
+import it.uniroma1.textadv.exceptions.*;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.oggetti.Blocker;
 import it.uniroma1.textadv.oggetti.Container;
@@ -75,35 +73,13 @@ public class Mondo {
      *
      * @return oggetto richiesto.
      */
-    public Oggetto getOggetto(String oggetto) {
-        return OGGETTI.get(oggetto);
-    }
-
-    /**
-     * Restituisce un personaggio presente nel mondo di gioco dato il nome.
-     *
-     * @return il personaggio richiesto.
-     */
-    public Personaggio getPersonaggio(String personaggio) {
-        return PERSONAGGI.get(personaggio);
-    }
-
-    /**
-     * Restituisce una stanza presente nel mondo di gioco dato il nome.
-     *
-     * @return la stanza richiesta.
-     */
-    public Stanza getStanza(String stanza) {
-        return STANZE.get(stanza);
-    }
-
-    /**
-     * Restituisce il dizionario dei link.
-     *
-     * @return dizionario dei link.
-     */
-    public Link getLink(String link) {
-        return LINKS.get(link);
+    public Item getItem(String name) throws ItemNotPresentException {
+        Item item = OGGETTI.get(name);
+        if (item == null) item = PERSONAGGI.get(name);
+        if (item == null) item = STANZE.get(name);
+        if (item == null) item = LINKS.get(name);
+        if (item == null) throw new ItemNotPresentException();
+        return item;
     }
 
     /**
@@ -185,10 +161,21 @@ public class Mondo {
             INSTANCE.readObjects(objectsText);
             INSTANCE.readCharacters(charactersText);
             INSTANCE.readRooms(roomsText);
+            INSTANCE.initLinks();
             INSTANCE.createPlayer(playerText, start);
             return INSTANCE;
         } catch (NullPointerException e) {
             throw new WronglyFormattedFileException(); // se manca la sezione "world"
+        }
+    }
+
+    private void initLinks() {
+        Stanza s1, s2;
+        for (Link link : LINKS.values()) {
+            s1 = STANZE.get(link.getSTANZA1());
+            s2 = STANZE.get(link.getSTANZA2());
+            if (s1 == null || s2 == null) throw new RoomNotPresentException();
+            link.init(s1, s2);
         }
     }
 
@@ -367,5 +354,5 @@ public class Mondo {
     //  lo stesso oggetto o personaggio viene inserito in più stanze,
     //  se gli oggetti specificati in ogni stanza sono sempre associati a una classe Java corrispondente,
     //  altri eventuali errori che possono rendere impossibile la creazione del mondo (ad es. due stanze od oggetti con
-    //  lo stesso nome).
+    //  lo stesso nome, nome non null).
 }
