@@ -4,31 +4,48 @@ import it.uniroma1.textadv.Direzione;
 import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.Mondo;
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
-import it.uniroma1.textadv.exceptions.ItemNotPresentException;
-import it.uniroma1.textadv.exceptions.WrongParameterException;
 import it.uniroma1.textadv.textengine.actions.Action;
 import it.uniroma1.textadv.textengine.actions.ActionFactory;
+import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
+ * Rappresenta un comando inserito dall'utente. A ogni comando corrispondono un azione del giocatore e dei parametri.
+ * Ogni azione viene creata sulla base della {@link ActionFactory } associata alla lingua. La lingua predefinita è
+ * l'italiano.
  *
+ * @see Language
+ * @see Action
+ * @see ActionFactory
  */
 public class Command {
 
 
-    private static Language language;
+    /**
+     * Lingua in cui vengono localizzati i comandi. Predefinito italiano.
+     */
+    private static Language language = EnglishAndItalian.IT;
 
-    private static ActionFactory factory;
+    /**
+     * Action factory con cui ottenere le varie azioni. Predefinita quella fornita dalla lingua italiana.
+     */
+    private static ActionFactory factory = EnglishAndItalian.IT.getActionFactory();
 
+    /**
+     * Azione che il giocatore compie.
+     */
     private final Action action;
 
+    /**
+     * Parametri con cui compie l'azione.
+     */
     private final List<String> arguments;
+
 
     private Command(Action action, List<String> arguments) {
         this.action = action;
@@ -67,7 +84,7 @@ public class Command {
     }
 
     /**
-     * Cambia la factory dei comandi.
+     * Cambia la factory delle azioni.
      *
      * @param factory la nuova factory.
      */
@@ -81,7 +98,7 @@ public class Command {
 
     @Override
     public String toString() {
-        return action + (arguments.size() > 0? " arguments=" + arguments : "");
+        return action + (arguments.size() > 0 ? " arguments=" + arguments : "");
     }
 
     /**
@@ -99,48 +116,52 @@ public class Command {
      * @param input la stringa da cui creare il comando
      * @return il comando creato
      */
-    public static Command create(String input) throws ActionNotKnownException, WrongParameterException {
-        List<String> args = new ArrayList<>(Arrays.asList(input.toLowerCase(Locale.ROOT).split("\\s+"))),
-                realArgs = new ArrayList<>();
-        String arg;
-
+    public static Command create(String input) throws ActionNotKnownException {
+        List<String> args = new ArrayList<>(Arrays.asList(input.toLowerCase().split("\\s+")));
         Action action = factory.getAction(args.remove(0));
-
-        while (!args.isEmpty()) {
-            arg = findArg(args);
-            if (arg != null) realArgs.add(arg);
-        }
-
-        return new Command(action, realArgs);
+        return new Command(action, findArgs(new ArrayList<>(args)));
     }
 
-    private static String findArg(List<String> args) throws WrongParameterException {
-        Item res;
-        String name;
+    private static List<String> findArgs(List<String> args){
+        List<String> realArgs = new ArrayList<>();
+        Item item;
         Direzione dir;
-        int limit = args.size();
-        while (limit > 0) {
-            name = args.stream().limit(limit).collect(Collectors.joining(" "));
-            dir = Direzione.get(name);
-            if (dir != null) {
-                args.subList(0, limit).clear();
-                return dir.toString();
-            }
-            try {
-                res = Mondo.getInstance().getItem(name);
-                args.subList(0, limit).clear();
-                return res.getNome();
-            } catch (ItemNotPresentException e) {
-                if (limit == 1) {
-                    if (language.getSTOP_WORDS().stream().anyMatch(s -> s.equals(args.get(0)))){
-                        args.remove(0);
-                        return null;
-                    }
-                    throw new WrongParameterException();
+        String name, arg = null;
+        int range;
+
+        while (!args.isEmpty()) {
+            range = args.size();
+            while (range > 0) {
+
+                name = args.stream().limit(range).collect(Collectors.joining(" "));
+
+                item = Mondo.getInstance().getItem(name);
+                if (item != null) {
+                    args.subList(0, range).clear();
+                    arg = item.getName();
+                    break;
                 }
+
+                if (range == 1) {
+                    dir = Direzione.get(name);
+                    if (language.getSTOP_WORDS().stream().anyMatch(s -> s.equals(args.get(0))))
+                        args.remove(0);
+                    else if (dir != null) {
+                        args.remove(0);
+                        arg = dir.toString();
+                    } else {
+                        arg = String.join(" ", args);
+                        args.subList(0, args.size()).clear();
+                    }
+                }
+
+                range--;
             }
-            limit --;
+            if (arg != null) {
+                realArgs.add(arg);
+                arg = null;
+            }
         }
-        return null;
+        return realArgs;
     }
 }

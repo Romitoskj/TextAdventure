@@ -1,7 +1,7 @@
 package it.uniroma1.textadv.personaggi;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.Storable;
@@ -12,7 +12,7 @@ public abstract class Personaggio implements Item {
 
 	protected final String nome;
 	
-	protected final Map<String, Storable> inventario = new HashMap<>();
+	protected final Map<String, Storable> inventario = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	
 	public Personaggio(String nome) {
 		this.nome = nome;
@@ -25,7 +25,7 @@ public abstract class Personaggio implements Item {
 		}
 	}
 
-	public String getNome() {
+	public String getName() {
 		return nome;
 	}
 
@@ -35,7 +35,7 @@ public abstract class Personaggio implements Item {
 	}
 
 	public void store(Storable toStore) {
-		inventario.put(toStore.getNome(), toStore);
+		inventario.put(toStore.getName(), toStore);
 	}
 
 	public Storable getInventoryItem(String name) throws ItemNotPresentException {

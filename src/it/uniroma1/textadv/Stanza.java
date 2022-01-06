@@ -8,10 +8,7 @@ import it.uniroma1.textadv.personaggi.Personaggio;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Rappresenta una stanza del mondo di gioco, ossia un qualsiasi spazio in cui può trovarsi il giocatore (sia aperto sia
@@ -42,8 +39,8 @@ public class Stanza implements Item {
         public Builder(String nome, String descrizione) {
             this.nome = nome;
             this.descrizione = descrizione;
-            oggetti = new HashMap<>();
-            personaggi = new HashMap<>();
+            oggetti = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            personaggi = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             links = new HashMap<>();
         }
 
@@ -54,7 +51,7 @@ public class Stanza implements Item {
          * @return Builder della stanza.
          */
         public Builder addOggetto(Oggetto oggetto) {
-            oggetti.put(oggetto.getNome(), oggetto);
+            oggetti.put(oggetto.getName(), oggetto);
             return this;
         }
 
@@ -65,7 +62,7 @@ public class Stanza implements Item {
          * @return Builder della stanza.
          */
         public Builder addPersonaggio(Personaggio personaggio) {
-            personaggi.put(personaggio.getNome(), personaggio);
+            personaggi.put(personaggio.getName(), personaggio);
             return this;
         }
 
@@ -125,7 +122,7 @@ public class Stanza implements Item {
     }
 
     @Override
-    public String getNome() {
+    public String getName() {
         return nome;
     }
 
@@ -146,12 +143,12 @@ public class Stanza implements Item {
         if (this == o) return true;
         if (!(o instanceof Stanza)) return false;
         Stanza stanza = (Stanza) o;
-        return getNome().equals(stanza.getNome());
+        return getName().equals(stanza.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getNome());
+        return Objects.hash(getName());
     }
 
     private String mapList(Map<String, ? extends Item> m, Language language) {
@@ -174,7 +171,7 @@ public class Stanza implements Item {
             sb.append((language.equals(EnglishAndItalian.IT)?"a " : ""))
                     .append(d.get(language))
                     .append(" ")
-                    .append(links.get(d).getNome())
+                    .append(links.get(d).getName())
                     .append((k == l.size() - 2) ? (language.equals(EnglishAndItalian.IT)? " e " : " and ") : ", ");
             k++;
         }
@@ -189,15 +186,15 @@ public class Stanza implements Item {
 
     public Link getLink(String nome) throws ItemNotPresentException {
         for (Link l : links.values()) {
-            if (l.getNome().equalsIgnoreCase(nome))
+            if (l.getName().equalsIgnoreCase(nome))
                 return l;
         }
         throw new ItemNotPresentException();
     }
 
     public void add(Storable s) {
-        if (s instanceof Oggetto) oggetti.put(s.getNome(), (Oggetto) s);
-        if (s instanceof Personaggio) personaggi.put(s.getNome(), (Personaggio) s);
+        if (s instanceof Oggetto) oggetti.put(s.getName(), (Oggetto) s);
+        if (s instanceof Personaggio) personaggi.put(s.getName(), (Personaggio) s);
     }
 
     public Item get(String nome) throws ItemNotPresentException {
@@ -233,5 +230,16 @@ public class Stanza implements Item {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Stanza{" +
+                "nome='" + nome + '\'' +
+                ", descrizione='" + descrizione + '\'' +
+                ", oggetti=" + oggetti +
+                ", personaggi=" + personaggi +
+                ", links=" + links +
+                '}';
     }
 }

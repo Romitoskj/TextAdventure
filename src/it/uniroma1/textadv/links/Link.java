@@ -49,7 +49,7 @@ public class Link implements Item, Lockable {
 	}
 
 	@Override
-	public String getNome() {
+	public String getName() {
 		return nome;
 	}
 
@@ -84,6 +84,13 @@ public class Link implements Item, Lockable {
 		if (isUnlocked()) {
 			closed = false;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Link{" +
+				"nome='" + nome + '\''+
+				'}';
 	}
 
 	@Override

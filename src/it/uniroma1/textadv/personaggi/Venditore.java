@@ -17,7 +17,7 @@ public class Venditore extends Personaggio implements Observer {
 
 	private final String needed = "soldi";
 
-	public Venditore(String nome, String... toSell) throws ItemNotPresentException {
+	public Venditore(String nome, String... toSell) {
 		super(nome);
 		Subject item;
 		for (String name : toSell) {
@@ -33,18 +33,18 @@ public class Venditore extends Personaggio implements Observer {
 
 	@Override
 	public void update() {
-		System.out.println("\n" + getNome() + ": " + (Command.getLanguage().equals(EnglishAndItalian.IT)?
+		System.out.println("\n" + getName() + ": " + (Command.getLanguage().equals(EnglishAndItalian.IT)?
 				"'Hey! Prima dovresti pagare...'":
 				"'Hey! You have to pay first..."));
 	}
 	
 	@Override
 	public void store(Storable toStore) {
-		if (toStore.getNome().equalsIgnoreCase(needed)) {
+		if (toStore.getName().equalsIgnoreCase(needed)) {
 			for (Subject item: toSell) {
 				item.rimuoviObserver(this);
 				try {
-					Giocatore.getInstance().takeFromRoom(item.getNome());
+					Giocatore.getInstance().takeFromRoom(item.getName());
 				} catch (ItemNotPresentException ignored) {
 					// se ha dato cosa vuole è per forza nella stessa stanza
 				}

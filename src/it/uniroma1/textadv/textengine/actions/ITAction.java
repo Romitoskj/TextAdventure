@@ -1,6 +1,5 @@
 package it.uniroma1.textadv.textengine.actions;
 
-import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
@@ -33,7 +32,7 @@ public enum ITAction implements Action {
 
     APRI(Action::open, "\t\t\tApri un oggetto o un passaggio chiuso. Se è chiuso a chiave o bloccato dovrai specificare con cosa aprirlo."),
 
-    ROMPI(Action::breakItem, "\t\t\tUsalo per rompere un oggetto nella stanza dove ti trovi (non tutti gli oggetti possono essere rotti."),
+    ROMPI(Action::breakItem, "\t\t\tUsalo per rompere un oggetto nella stanza dove ti trovi (non tutti gli oggetti possono essere rotti)."),
 
     PARLA(Action::speak, "\t\t\tUsalo per dialogare con altri personaggi."),
 

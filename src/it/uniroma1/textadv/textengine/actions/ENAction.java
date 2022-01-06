@@ -1,6 +1,5 @@
 package it.uniroma1.textadv.textengine.actions;
 
-import it.uniroma1.textadv.Item;
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;

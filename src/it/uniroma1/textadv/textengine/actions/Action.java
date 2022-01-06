@@ -16,7 +16,6 @@ import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.Language;
 
 import java.util.List;
-import java.util.Objects;
 
 import static it.uniroma1.textadv.personaggi.Giocatore.getInstance;
 
@@ -85,8 +84,8 @@ public interface Action {
                 return "Non c'è nessun passaggio chiamato così.";
             }
         }
-        if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome() + ".";
-        return "Il passaggio " + link.getNome() + " è chiuso.";
+        if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getName() + ".";
+        return "Il passaggio " + link.getName() + " è chiuso.";
     }
 
     static String enter(List<String> args, Language language) {
@@ -95,7 +94,7 @@ public interface Action {
         Link link;
         try {
             link = getInstance().searchLink(args.get(0));
-            if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getNome() + ".";
+            if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getName() + ".";
             return "Il passaggio è chiuso.";
         } catch (ItemNotPresentException e) {
             return "Non c'è nessun passaggio chiamato così.";
@@ -132,9 +131,9 @@ public interface Action {
     private static String collectFromCharacter(String name, Personaggio p, Language language) {
         try {
             p.dai(name, getInstance());
-            return p.getNome() + " ti ha dato " + name + ".";
+            return p.getName() + " ti ha dato " + name + ".";
         } catch (ItemNotPresentException e) {
-            return p.getNome() + " non ha nulla del genere...";
+            return p.getName() + " non ha nulla del genere...";
         }
     }
 
@@ -146,7 +145,7 @@ public interface Action {
             if (toStore != null) getInstance().store(toStore);
             return "Oggetto aggiunto all'inventario!";
         } catch (ItemNotPresentException e) {
-            return container.getNome() + " non contiene " + name + ".";
+            return container.getName() + " non contiene " + name + ".";
         }
     }
 
@@ -214,7 +213,7 @@ public interface Action {
         if (args.size() > 1) return "Puoi parlare solo ad un personaggio per volta.";
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
-            return personaggio.getNome() + ":'" + personaggio.parla(language) + "'";
+            return personaggio.getName() + ":'" + personaggio.parla(language) + "'";
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -226,7 +225,7 @@ public interface Action {
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
             if (!(personaggio instanceof Animal)) return "Non è carino accarezzare una persona che non conosci!";
-            return personaggio.getNome() + ":'" + personaggio.parla(language) + "'";
+            return personaggio.getName() + ":'" + personaggio.parla(language) + "'";
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -241,9 +240,9 @@ public interface Action {
             try {
                 getInstance().dai(itemName, p);
                 if (p instanceof Venditore) {
-                    if (itemName.equals(((Venditore) p).getNeeded())) return p.getNome() + " ti ha dato secchio e tronchesi.";
+                    if (itemName.equals(((Venditore) p).getNeeded())) return p.getName() + " ti ha dato secchio e tronchesi.";
                 }
-                return itemName + " dato a " + p.getNome() + ".";
+                return itemName + " dato a " + p.getName() + ".";
             } catch (ItemNotPresentException e) {
                 return "Non hai nulla del genere...";
             }
@@ -259,6 +258,7 @@ public interface Action {
             item = getInstance().getInventoryItem(args.get(0));
             if (item instanceof Opener) {
                 if (args.size() < 2) return "Devi specificare su cosa usare l'oggetto.";
+                if (args.size() > 2) return "Puoi specificare massimo due oggetti.";
                 try {
                     link = getInstance().searchItem(args.get(1));
                 } catch (ItemNotPresentException e) {
@@ -272,7 +272,7 @@ public interface Action {
                 if (link instanceof Teletrasporto) {
                     Teletrasporto t = (Teletrasporto) link;
                     String open = open(List.of(args.get(1), args.get(0)), language);
-                    if (t.isOpen()) return go(List.of(t.getNome()), language);
+                    if (t.isOpen()) return go(List.of(t.getName()), language);
                     return open;
                 }
                 return open(List.of(args.get(1), args.get(0)), language);

@@ -11,7 +11,7 @@ public class Salvadanaio extends Container implements Breakable {
 
     @Override
     public String getDescription(Language language) {
-        if (language.equals(EnglishAndItalian.IT)) return getNome() + (isOpen()? (isEmpty()? " rotto" : " rotto con vicino dei " + getContentName()) : "");
-        else  return (isOpen()? (isEmpty()? " broken" + getNome() : " broken" + getNome() + " con vicino dei " + getContentName()) : getNome());
+        if (language.equals(EnglishAndItalian.IT)) return getName() + (isOpen()? (isEmpty()? " rotto" : " rotto con vicino dei " + getContentName()) : "");
+        else  return (isOpen()? (isEmpty()? " broken" + getName() : " broken" + getName() + " con vicino dei " + getContentName()) : getName());
     }
 }

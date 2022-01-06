@@ -1,7 +1,6 @@
 package it.uniroma1.textadv.oggetti;
 
 import it.uniroma1.textadv.Lockable;
-import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 

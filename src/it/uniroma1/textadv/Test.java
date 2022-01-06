@@ -8,7 +8,7 @@ public class Test {
 		Gioco g = new Gioco();
 		Mondo m = Mondo.fromFile("minizak.game");
 		// Mondo m = Mondo.fromFile("english.game");
-		g.play(m);
-		// g.play(m, Path.of("minizak.ff"));
+		g.play(m, Path.of("minizak.ff"));
+		//g.play(m);
 	}
 }

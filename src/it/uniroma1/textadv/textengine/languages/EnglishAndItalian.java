@@ -1,6 +1,7 @@
 package it.uniroma1.textadv.textengine.languages;
 
 import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
+import it.uniroma1.textadv.personaggi.Giocatore;
 import it.uniroma1.textadv.textengine.actions.ActionFactory;
 import it.uniroma1.textadv.textengine.actions.ENAction;
 import it.uniroma1.textadv.textengine.actions.ITAction;
@@ -18,12 +19,15 @@ public enum EnglishAndItalian implements Language {
             "for", "inside", "in", "into", "near", "like", "of", "on", "to", "since", "toward", "under", "though", "up",
             "until", "upon", "within", "with"),
             Map.ofEntries(
-                    entry("start", "You can write \"help\" in any moment if your struggle with the commands.\n" +
-                            "Write \"look\" to look around the room and start the adventure!"),
+                    entry("start", """
+                            You are  %s and your goal is to find the hidden treasure.
+
+                            You can write "help" in any moment if your struggle with the commands.
+                            Write "look" to look around the room and start the adventure!"""),
                     entry("not_found_action", "Unrecognized action."),
-                    entry("wrong_args", "I don't know what you are talking about..."),
-                    entry("win", "Well done! You win!"),
-                    entry("end", "Write \"quit\" to quit the game.")
+                    entry("win", "Well done! You found the treasure!"),
+                    entry("end", "Write \"quit\" to quit the game."),
+                    entry("quit", "quit")
             )
     ),
 
@@ -33,12 +37,15 @@ public enum EnglishAndItalian implements Language {
             "dalle", "in", "nel", "nello", "nella", "nei", "negli", "nelle", "su", "sul", "sullo", "sulla", "sui",
             "sugli", "sulle", "con", "dentro"),
             Map.ofEntries(
-                    entry("start", "In ogni momento potrai scrivere \"aiuto\" se hai bisogno di una mano con i comandi.\n" +
-                            "Scrivi \"guarda\" per guardarti intorno e iniziare l'avventura!"),
+                    entry("start", """
+                            Sei %s e il tuo obbiettivo è trovare il tesoro nascosto.
+
+                            In ogni momento potrai scrivere "aiuto" se hai bisogno di una mano con i comandi.
+                            Scrivi "guarda" per guardarti intorno e iniziare l'avventura!"""),
                     entry("not_found_action", "Azione non riconosciuta."),
-                    entry("wrong_args", "Non so a cosa ti riferisci..."),
-                    entry("win", "Congratulazioni! Hai vinto!"),
-                    entry("end", "Scrivi \"esci\" per uscire dal gioco.")
+                    entry("win", "Congratulazioni! Hai trovato il tesoro!"),
+                    entry("end", "Scrivi \"esci\" per uscire dal gioco."),
+                    entry("quit", "esci")
             )
     );
 

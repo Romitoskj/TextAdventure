@@ -2,7 +2,6 @@ package it.uniroma1.textadv;
 
 import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
-import it.uniroma1.textadv.exceptions.WrongParameterException;
 import it.uniroma1.textadv.personaggi.Giocatore;
 import it.uniroma1.textadv.personaggi.Observer;
 import it.uniroma1.textadv.textengine.Command;
@@ -15,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 
 public class Gioco implements Observer {
@@ -44,7 +42,7 @@ public class Gioco implements Observer {
 		}
 
 		System.out.println(world);
-		System.out.println(Command.getLanguage().getAnswer("start"));
+		System.out.println(Command.getLanguage().getAnswer("start").formatted(Giocatore.getInstance().getName()));
 		do {
 			if (win) {
 				System.out.println("\n" + Command.getLanguage().getAnswer("win"));
@@ -58,11 +56,9 @@ public class Gioco implements Observer {
 				output = command.execute();
 			} catch (ActionNotKnownException e) {
 				output = Command.getLanguage().getAnswer("not_found_action");
-			} catch (WrongParameterException e) {
-                output = Command.getLanguage().getAnswer("wrong_args");
-            }
+			}
             System.out.println("\n" + output);
-		} while (!input.equalsIgnoreCase("esci") && !input.equalsIgnoreCase("quit"));
+		} while (!input.equalsIgnoreCase(Command.getLanguage().getAnswer("quit")));
 	}
 
 	public void play(Mondo world, Path scriptFF) throws IOException {
@@ -73,6 +69,8 @@ public class Gioco implements Observer {
 		Command command;
 		int k;
 
+		System.out.println(world);
+
         while (lines.hasNext()) {
 			System.out.print("> ");
 			try {
@@ -81,13 +79,10 @@ public class Gioco implements Observer {
 				if (k >= 0) line = line.substring(0, k); // rimuove commenti
 				System.out.println(line);
 				command = Command.create(line.strip());
-				System.out.println(command);
 				output = command.execute();
 			} catch (ActionNotKnownException e) {
 				output = Command.getLanguage().getAnswer("not_found_action");
-			} catch (WrongParameterException e) {
-                output = Command.getLanguage().getAnswer("wrong_args");
-            }
+			}
             System.out.println("\n" + output);
 		}
 		if (win) System.out.println("\n" + Command.getLanguage().getAnswer("win"));

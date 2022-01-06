@@ -12,7 +12,7 @@ public interface Item {
      *
      * @return nome.
      */
-    String getNome();
+    String getName();
 
     /**
      * Restituisce la descrizione in base alla lingua di gioco.

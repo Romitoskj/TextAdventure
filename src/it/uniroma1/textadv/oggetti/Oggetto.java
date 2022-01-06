@@ -6,24 +6,24 @@ import it.uniroma1.textadv.textengine.languages.Language;
 
 public abstract class Oggetto implements Item {
 
-	protected String nome;
+	protected final String nome;
 
 	public Oggetto(String nome) {
 		this.nome = nome;
 	}
 
 	@Override
-	public String getNome() {
+	public String getName() {
 		return nome;
 	}
 
 	@Override
 	public String toString() {
-		return getNome();
+		return getName();
 	}
 
 	@Override
 	public String getDescription(Language language) {
-		return getNome();
+		return getName();
 	}
 }
