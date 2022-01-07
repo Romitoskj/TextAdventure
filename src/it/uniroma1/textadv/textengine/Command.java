@@ -52,18 +52,6 @@ public class Command {
         this.arguments = arguments;
     }
 
-    /*
-    public Command(String input) throws ActionNotKnownException {
-        // String[] words = input.split("\\s+", 2);
-        String[] words = input.split("-+");
-        action = factory.getAction(words[0]);
-        arguments = Arrays.stream(words)
-                .skip(1)
-                .filter(w -> !language.getSTOP_WORDS().contains(w.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-    */
-
     /**
      * Restituisce la lingua in cui sono scritti i comandi.
      *
@@ -116,7 +104,7 @@ public class Command {
      * @param input la stringa da cui creare il comando
      * @return il comando creato
      */
-    public static Command create(String input) throws ActionNotKnownException {
+    public static Command from(String input) throws ActionNotKnownException {
         List<String> args = new ArrayList<>(Arrays.asList(input.toLowerCase().split("\\s+")));
         Action action = factory.getAction(args.remove(0));
         return new Command(action, findArgs(new ArrayList<>(args)));

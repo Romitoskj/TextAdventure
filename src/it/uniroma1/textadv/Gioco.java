@@ -51,7 +51,7 @@ public class Gioco implements Observer {
 			System.out.print("> ");
 			input = scanner.nextLine();
 			try {
-				command = Command.create(input.strip());
+				command = Command.from(input.strip());
 				System.out.println("*".repeat(40) + " " + command);
 				output = command.execute();
 			} catch (ActionNotKnownException e) {
@@ -78,7 +78,7 @@ public class Gioco implements Observer {
 				k = line.indexOf("//");
 				if (k >= 0) line = line.substring(0, k); // rimuove commenti
 				System.out.println(line);
-				command = Command.create(line.strip());
+				command = Command.from(line.strip());
 				output = command.execute();
 			} catch (ActionNotKnownException e) {
 				output = Command.getLanguage().getAnswer("not_found_action");

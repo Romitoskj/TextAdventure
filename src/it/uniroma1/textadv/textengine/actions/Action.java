@@ -26,7 +26,7 @@ public interface Action {
     String execute(List<String> args);
 
     static String help(List<String> args, Language language) {
-        if (args.size() > 1) return "Questo comando accetta al massimo un argomento.";
+        if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
         ActionFactory actionFactory = Command.getFactory();
         if (args.size() == 1) {
             String actionName = args.get(0).toUpperCase();
@@ -84,8 +84,8 @@ public interface Action {
                 return "Non c'è nessun passaggio chiamato così.";
             }
         }
-        if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getName() + ".";
-        return "Il passaggio " + link.getName() + " è chiuso.";
+        if (getInstance().goThrough(link)) return "Sei in %s.".formatted(getInstance().getPosizione().getName());
+        return "Il passaggio %s è chiuso.".formatted(link.getName());
     }
 
     static String enter(List<String> args, Language language) {
@@ -94,7 +94,7 @@ public interface Action {
         Link link;
         try {
             link = getInstance().searchLink(args.get(0));
-            if (getInstance().goThrough(link)) return "Sei in " + getInstance().getPosizione().getName() + ".";
+            if (getInstance().goThrough(link)) return "Sei in %s.".formatted(getInstance().getPosizione().getName());
             return "Il passaggio è chiuso.";
         } catch (ItemNotPresentException e) {
             return "Non c'è nessun passaggio chiamato così.";
@@ -122,7 +122,7 @@ public interface Action {
             Item item = getInstance().searchItem(from);
             if (item instanceof Personaggio) return collectFromCharacter(name, (Personaggio) item, language);
             if (item instanceof Container) return collectFromContainer(name, (Container) item, language);
-            return from + " non è né un contenitore né un personaggio.";
+            return "%s non è né un contenitore né un personaggio.".formatted(from);
         } catch (ItemNotPresentException e) {
             return "In questa stanza non c'è nulla del genere...";
         }
@@ -131,21 +131,21 @@ public interface Action {
     private static String collectFromCharacter(String name, Personaggio p, Language language) {
         try {
             p.dai(name, getInstance());
-            return p.getName() + " ti ha dato " + name + ".";
+            return "%s ti ha dato %s.".formatted(p.getName(), name);
         } catch (ItemNotPresentException e) {
-            return p.getName() + " non ha nulla del genere...";
+            return "%s non ha nulla del genere...".formatted(p.getName());
         }
     }
 
     private static String collectFromContainer(String name, Container container, Language language) {
         if (!container.isOpen())
-            return container + " è " + (container instanceof Camino ? "acceso." : "chiuso.");
+            return "%s è %s." .formatted(container, (container instanceof Camino ? "acceso" : "chiuso"));
         try {
             Storable toStore = container.takeContent(name);
             if (toStore != null) getInstance().store(toStore);
             return "Oggetto aggiunto all'inventario!";
         } catch (ItemNotPresentException e) {
-            return container.getName() + " non contiene " + name + ".";
+            return "%s non contiene %s.".formatted(container.getName(), name);
         }
     }
 
@@ -175,21 +175,21 @@ public interface Action {
 
         toOpen = (Lockable) item;
         boolean breakable = item instanceof Breakable;
-        if (toOpen.isOpen()) return "E' già " + (breakable ? "rotto" : "aperto") + "!";
+        if (toOpen.isOpen()) return "E' già %s!".formatted((breakable ? "rotto" : "aperto"));
         if (!toOpen.isUnlocked()) {
             if (args.size() < 2)
-                return "Serve qualcosa per " + (breakable ? "rompere" : "aprire") + " quest'oggetto...";
+                return "Serve qualcosa per %s quest'oggetto...".formatted((breakable ? "rompere" : "aprire"));
             if (args.size() > 2)
-                return "Devi specificare un solo oggetto che " + (breakable ? "rompe" : "apre") + " il primo.";
+                return "Devi specificare un solo oggetto che %s il primo.".formatted((breakable ? "rompe" : "apre"));
             try {
                 item = getInstance().getInventoryItem(args.get(1));
             } catch (ItemNotPresentException e) {
                 return "Non hai nulla del genere...";
             }
-            if (!(item instanceof Opener)) return "Non si " + (breakable ? "rompe" : "apre") + " con quest'oggetto...";
+            if (!(item instanceof Opener)) return "Non si %s con quest'oggetto...".formatted((breakable ? "rompe" : "apre"));
             toOpen.unlock((Opener) item);
-            if (!toOpen.isUnlocked()) return "Non si " + (breakable ? "rompe" : "apre") + " con quest'oggetto...";
-        } else if (args.size() > 1) return "Non è bloccato, " + (breakable ? "rompilo" : "aprilo") + " e basta!";
+            if (!toOpen.isUnlocked()) return "Non si %s con quest'oggetto...".formatted((breakable ? "rompe" : "apre"));
+        } else if (args.size() > 1) return "Non è bloccato, %s e basta!".formatted((breakable ? "rompilo" : "aprilo"));
         toOpen.open();
         if (toOpen instanceof Camino) return "Spento!";
         return (breakable? "Rotto!" : "Aperto!");
@@ -201,7 +201,7 @@ public interface Action {
             return "Devi specificare solo due oggetti, uno da rompere e uno con cui rompere il primo.";
         try {
             Oggetto o = (Oggetto) getInstance().searchItem(args.get(0));
-            if (!(o instanceof Breakable)) return args.get(0) + " non può essere rotto.";
+            if (!(o instanceof Breakable)) return "%s non può essere rotto.".formatted(args.get(0));
             return open(args, language);
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessun oggetto chiamato così qui...";
@@ -213,7 +213,7 @@ public interface Action {
         if (args.size() > 1) return "Puoi parlare solo ad un personaggio per volta.";
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
-            return personaggio.getName() + ":'" + personaggio.parla(language) + "'";
+            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(language));
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -225,7 +225,7 @@ public interface Action {
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
             if (!(personaggio instanceof Animal)) return "Non è carino accarezzare una persona che non conosci!";
-            return personaggio.getName() + ":'" + personaggio.parla(language) + "'";
+            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(language));
         } catch (ClassCastException | ItemNotPresentException e) {
             return "Non c'è nessuno chiamato così qui...";
         }
@@ -240,9 +240,9 @@ public interface Action {
             try {
                 getInstance().dai(itemName, p);
                 if (p instanceof Venditore) {
-                    if (itemName.equals(((Venditore) p).getNeeded())) return p.getName() + " ti ha dato secchio e tronchesi.";
+                    if (itemName.equals(((Venditore) p).getNeeded())) return "%s ti ha dato secchio e tronchesi.".formatted(p.getName());
                 }
-                return itemName + " dato a " + p.getName() + ".";
+                return "%s dato a %s.".formatted(itemName, p.getName());
             } catch (ItemNotPresentException e) {
                 return "Non hai nulla del genere...";
             }

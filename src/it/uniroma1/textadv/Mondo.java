@@ -99,20 +99,20 @@ public class Mondo {
     /**
      * Crea un mondo a partire da un file .game.
      *
-     * @param percorso - stringa del percorso del file
+     * @param percorso stringa del percorso del file
      * @return un mondo di gioco
-     * @throws IOException - se occorre un errore I/O leggendo il file
-     * @throws WronglyFormattedFileException se il file .game non è formattato correttamente
-     * @throws RoomNotPresentException se un link prova a collegare una stanza non presente
+     * @throws IOException                     se occorre un errore I/O leggendo il file
+     * @throws WronglyFormattedFileException   se il file .game non è formattato correttamente
+     * @throws RoomNotPresentException         se un link prova a collegare una stanza non presente
      * @throws RoomWithoutDescriptionException se non viene fornita la descrizione di una stanza
-     * @throws ClassNotFoundException se non viene trovata la classe corrispondente a un item
-     * @throws InvocationTargetException se la costruzione di un item solleva un eccezione
-     * @throws NoSuchMethodException se il costruttore di un item non viene trovato
-     * @throws InstantiationException se un item non può essere creato
-     * @throws IllegalAccessException se non il metodo non ha accesso alla definizione di un item
-     * @throws ItemInMultipleRoomsException se un item viene inserito in più stanze (nel caso dei link più di due stanze)
-     * @throws ItemAlreadyCreated se viene creato un item con il nome di uno già
-     * @throws RoomWithoutLinksException se viene creata una stanza senza nemmeno un link
+     * @throws ClassNotFoundException          se non viene trovata la classe corrispondente a un item
+     * @throws InvocationTargetException       se la costruzione di un item solleva un eccezione
+     * @throws NoSuchMethodException           se il costruttore di un item non viene trovato
+     * @throws InstantiationException          se un item non può essere creato
+     * @throws IllegalAccessException          se non il metodo non ha accesso alla definizione di un item
+     * @throws ItemInMultipleRoomsException    se un item viene inserito in più stanze (nel caso dei link più di due stanze)
+     * @throws ItemAlreadyCreated              se viene creato un item con il nome di uno già
+     * @throws RoomWithoutLinksException       se viene creata una stanza senza nemmeno un link
      */
     public static Mondo fromFile(String percorso) throws IOException, WronglyFormattedFileException, RoomNotPresentException, RoomWithoutDescriptionException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemInMultipleRoomsException, ItemAlreadyCreated, RoomWithoutLinksException {
         return fromFile(Path.of(percorso));
@@ -123,18 +123,18 @@ public class Mondo {
      *
      * @param path - {@link Path} del percorso del file
      * @return un mondo di gioco
-     * @throws IOException se occorre un errore I/O leggendo il file
-     * @throws WronglyFormattedFileException se il file .game non è formattato correttamente
-     * @throws RoomNotPresentException se un link prova a collegare una stanza non presente
+     * @throws IOException                     se occorre un errore I/O leggendo il file
+     * @throws WronglyFormattedFileException   se il file .game non è formattato correttamente
+     * @throws RoomNotPresentException         se un link prova a collegare una stanza non presente
      * @throws RoomWithoutDescriptionException se non viene fornita la descrizione di una stanza
-     * @throws ClassNotFoundException se non viene trovata la classe corrispondente a un item
-     * @throws InvocationTargetException se la costruzione di un item solleva un eccezione
-     * @throws NoSuchMethodException se il costruttore di un item non viene trovato
-     * @throws InstantiationException se un item non può essere creato
-     * @throws IllegalAccessException se non il metodo non ha accesso alla definizione di un item
-     * @throws ItemInMultipleRoomsException se un item viene inserito in più stanze (nel caso dei link più di due stanze)
-     * @throws ItemAlreadyCreated se viene creato un item con il nome di uno già presente
-     * @throws RoomWithoutLinksException se viene creata una stanza senza nemmeno un link
+     * @throws ClassNotFoundException          se non viene trovata la classe corrispondente a un item
+     * @throws InvocationTargetException       se la costruzione di un item solleva un eccezione
+     * @throws NoSuchMethodException           se il costruttore di un item non viene trovato
+     * @throws InstantiationException          se un item non può essere creato
+     * @throws IllegalAccessException          se non il metodo non ha accesso alla definizione di un item
+     * @throws ItemInMultipleRoomsException    se un item viene inserito in più stanze (nel caso dei link più di due stanze)
+     * @throws ItemAlreadyCreated              se viene creato un item con il nome di uno già presente
+     * @throws RoomWithoutLinksException       se viene creata una stanza senza nemmeno un link
      */
     public static Mondo fromFile(Path path) throws IOException, WronglyFormattedFileException, RoomNotPresentException, RoomWithoutDescriptionException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemInMultipleRoomsException, ItemAlreadyCreated, RoomWithoutLinksException {
         String sectionType, sectionInfo = null, playerText = null, start = null;
@@ -151,11 +151,18 @@ public class Mondo {
             switch (sectionType) {
                 case "world" -> {
                     String name = null, description = null;
+                    if (section.size() == 0) throw new WronglyFormattedFileException();
                     for (String line : section) {
                         name = sectionInfo;
-                        if (line.startsWith("description")) description = line.split("\t")[1];
-                        else if (line.startsWith("start")) start = line.split("\t")[1];
+                        try {
+                            if (line.startsWith("description")) description = line.split("\t")[1];
+                            else if (line.startsWith("start")) start = line.split("\t")[1];
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new WronglyFormattedFileException();
+                        }
                     }
+                    if (name == null || name.equals("") || description == null || description.equals("") || start == null || start.equals(""))
+                        throw new WronglyFormattedFileException();
                     INSTANCE = new Mondo(name, description);
                 }
                 case "characters" -> charactersText = section;
@@ -218,13 +225,14 @@ public class Mondo {
 
     private void createPlayer(String playerText, String start) throws WronglyFormattedFileException {
         String[] info = playerText.split("\\t");
-        if (info[0].equals("") || info.length < 2 || !info[1].equals("Giocatore")) throw new WronglyFormattedFileException();
+        if (info[0].equals("") || info.length < 2 || !info[1].equals("Giocatore"))
+            throw new WronglyFormattedFileException();
         Giocatore.init(info[0], STANZE.get(start));
     }
 
     private Link createLink(String linkText) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, WronglyFormattedFileException {
         String[] linkInfo = linkText.split("\\t");
-        if(linkInfo.length < 4) throw new WronglyFormattedFileException();
+        if (linkInfo.length < 4) throw new WronglyFormattedFileException();
         String name = linkInfo[0], stanza1 = linkInfo[2], stanza2 = linkInfo[3];
         Class<?> c = Class.forName("it.uniroma1.textadv.links." + linkInfo[1]);
         Class<? extends Link> linkCls = c.asSubclass(Link.class);
@@ -237,7 +245,7 @@ public class Mondo {
         String[] oggettoInfo = oggettoText.split("\\t");
         String name = oggettoInfo[0], param;
         Link l;
-        if(name.equals("") || oggettoInfo.length < 2) throw new WronglyFormattedFileException();
+        if (name.equals("") || oggettoInfo.length < 2) throw new WronglyFormattedFileException();
         Class<?> c = Class.forName("it.uniroma1.textadv.oggetti." + oggettoInfo[1]);
         Class<? extends Oggetto> oggettoCls = c.asSubclass(Oggetto.class);
         Constructor<? extends Oggetto> constr;
@@ -261,7 +269,7 @@ public class Mondo {
         Personaggio p;
         String[] personaggioInfo = personaggioText.split("\\t");
         String name = personaggioInfo[0];
-        if(name.equals("") || personaggioInfo.length < 2) throw new WronglyFormattedFileException();
+        if (name.equals("") || personaggioInfo.length < 2) throw new WronglyFormattedFileException();
         Class<?> c = Class.forName("it.uniroma1.textadv.personaggi." + personaggioInfo[1]);
         Class<? extends Personaggio> linkCls = c.asSubclass(Personaggio.class);
         Constructor<? extends Personaggio> constr;
@@ -338,7 +346,11 @@ public class Mondo {
             text = roomsText.get(nome);
             for (String line : text) {
                 if (line.startsWith("description")) {
-                    builder = new Stanza.Builder(nome, line.split("\\t")[1]);
+                    try {
+                        builder = new Stanza.Builder(nome, line.split("\\t")[1]);
+                    } catch (IndexOutOfBoundsException e) {
+                        throw new RoomWithoutDescriptionException();
+                    }
                     break;
                 }
             }
@@ -385,5 +397,4 @@ public class Mondo {
             STANZE.put(nome, builder.build());
         }
     }
-    // TODO controllo formato righe stanze e mondo
 }
