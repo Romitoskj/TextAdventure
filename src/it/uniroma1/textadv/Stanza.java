@@ -26,29 +26,26 @@ public class Stanza implements Item {
         private final String descrizione;
 
         // optional parameters
-        private final Map<String, Oggetto> oggetti;
-        private final Map<String, Personaggio> personaggi;
-        private final Map<Direzione, Link> links;
+        private final Map<String, Oggetto> oggetti = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        private final Map<String, Personaggio> personaggi = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        private final Map<Direzione, Link> links = new HashMap<>();
 
         /**
          * Crea un Builder dati il nome della stanza e la sua descrizione.
          *
-         * @param nome        nome della stanza.
-         * @param descrizione descrizione della stanza.
+         * @param nome        nome della stanza
+         * @param descrizione descrizione della stanza
          */
         public Builder(String nome, String descrizione) {
             this.nome = nome;
             this.descrizione = descrizione;
-            oggetti = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            personaggi = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            links = new HashMap<>();
         }
 
         /**
          * Aggiunge un oggetto alla stanza.
          *
-         * @param oggetto {@link Oggetto} da aggiungere.
-         * @return Builder della stanza.
+         * @param oggetto {@link Oggetto} da aggiungere
+         * @return Builder della stanza
          */
         public Builder addOggetto(Oggetto oggetto) {
             oggetti.put(oggetto.getName(), oggetto);
@@ -58,8 +55,8 @@ public class Stanza implements Item {
         /**
          * Aggiunge un personaggio alla stanza.
          *
-         * @param personaggio {@link Personaggio} alla stanza.
-         * @return Builder della stanza.
+         * @param personaggio {@link Personaggio} alla stanza
+         * @return Builder della stanza
          */
         public Builder addPersonaggio(Personaggio personaggio) {
             personaggi.put(personaggio.getName(), personaggio);
@@ -69,9 +66,9 @@ public class Stanza implements Item {
         /**
          * Aggiunge un link a una determinata direzione della stanza.
          *
-         * @param dir  {@link Direzione} in cui aggiungere il link.
-         * @param link {@link Link} da aggiungere.
-         * @return Builder della stanza.
+         * @param dir  {@link Direzione} in cui aggiungere il link
+         * @param link {@link Link} da aggiungere
+         * @return Builder della stanza
          */
         public Builder addLink(Direzione dir, Link link) {
             links.put(dir, link);
@@ -81,7 +78,7 @@ public class Stanza implements Item {
         /**
          * Crea la stanza.
          *
-         * @return stanza.
+         * @return stanza
          */
         public Stanza build() {
             return new Stanza(this);
@@ -157,7 +154,7 @@ public class Stanza implements Item {
         Set<String> keySet = m.keySet();
         for (String s : keySet) {
             sb.append(m.get(s).getDescription(language))
-                    .append((k == keySet.size() - 2) ? (language.equals(EnglishAndItalian.IT)? " e " : " and ") : ", ");
+                    .append((k == keySet.size() - 2) ? (language.equals(EnglishAndItalian.IT) ? " e " : " and ") : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
@@ -168,22 +165,36 @@ public class Stanza implements Item {
         int k = 0;
         Set<Direzione> l = links.keySet();
         for (Direzione d : l) {
-            sb.append((language.equals(EnglishAndItalian.IT)?"a " : ""))
+            sb.append((language.equals(EnglishAndItalian.IT) ? "a " : ""))
                     .append(d.get(language))
                     .append(" ")
                     .append(links.get(d).getName())
-                    .append((k == l.size() - 2) ? (language.equals(EnglishAndItalian.IT)? " e " : " and ") : ", ");
+                    .append((k == l.size() - 2) ? (language.equals(EnglishAndItalian.IT) ? " e " : " and ") : ", ");
             k++;
         }
         return sb.delete(sb.length() - 2, sb.length()).append(".").toString();
     }
 
+    /**
+     * Restituisce il {@link Link} presente in una data {@link Direzione}.
+     *
+     * @param dir la direzione
+     * @return il link richiesto
+     * @throws ItemNotPresentException se in quella direzione non c'è nessun link
+     */
     public Link getLink(Direzione dir) throws ItemNotPresentException {
         Link l = links.get(dir);
         if (l == null) throw new ItemNotPresentException();
         return l;
     }
 
+    /**
+     * Restituisce un {@link Link} dato il suo nome.
+     *
+     * @param nome il nome del link
+     * @return il link richiesto
+     * @throws ItemNotPresentException se non c'è nessun link con il nome fornito
+     */
     public Link getLink(String nome) throws ItemNotPresentException {
         for (Link l : links.values()) {
             if (l.getName().equalsIgnoreCase(nome))
@@ -192,11 +203,23 @@ public class Stanza implements Item {
         throw new ItemNotPresentException();
     }
 
+    /**
+     * Aggiunge un oggetto alla stanza.
+     *
+     * @param s un oggetto di tipo {@link Storable}
+     */
     public void add(Storable s) {
         if (s instanceof Oggetto) oggetti.put(s.getName(), (Oggetto) s);
         if (s instanceof Personaggio) personaggi.put(s.getName(), (Personaggio) s);
     }
 
+    /**
+     * Restituisce un {@link Item} presente nella stanza dato il suo nome.
+     *
+     * @param nome il nome dell'item
+     * @return l'item richiesto
+     * @throws ItemNotPresentException se non c'è nessun item con il nome fornito
+     */
     public Item get(String nome) throws ItemNotPresentException {
         Item item = oggetti.get(nome.toLowerCase());
         if (item == null) {
@@ -216,6 +239,11 @@ public class Stanza implements Item {
         return item;
     }
 
+    /**
+     * Rimuove un {@link Item} dalla stanza dato il suo nome (eccetto i {@link Link}).
+     *
+     * @param nome il nome dell'item
+     */
     public void remove(String nome) {
         Item item = personaggi.remove(nome);
         if (item == null) oggetti.remove(nome);

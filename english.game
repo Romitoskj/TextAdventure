@@ -72,8 +72,8 @@ trapdoor	Botola	Zak's room	secret room
 front door	Porta	Zak's living room	outside
 closet door	Porta	Zak's living room	closet
 shuttle	Bus	outside	store
-teleport	Teletrasporto	secrete room	tiny mysterious room
-great door	Porta	secrete room	cobalt room
+teleport	Teletrasporto	secret room	tiny mysterious room
+great door	Porta	secret room	cobalt room
 red door	Porta	flame red room	green blue room
 blue door	Porta	green blue room	emerald room
 green door	Porta	green blue room	treasure room
@@ -81,7 +81,7 @@ green door	Porta	green blue room	treasure room
 [objects]
 desk	Scrivania	key
 screw	Vite	trapdoor
-key	Chiave	closet room
+key	Chiave	closet door
 moneybox	Salvadanaio	money
 money	Soldi
 hammer	Martello

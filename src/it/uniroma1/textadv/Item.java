@@ -8,14 +8,14 @@ import it.uniroma1.textadv.textengine.languages.Language;
 public interface Item {
 
     /**
-     * Restituisce il nome.
+     * Restituisce il nome dell'item.
      *
      * @return nome.
      */
     String getName();
 
     /**
-     * Restituisce la descrizione in base alla lingua di gioco.
+     * Restituisce la descrizione dell'item in base alla lingua di gioco.
      *
      * @param language la lingua di gioco {@link Language}.
      * @return descrizione.

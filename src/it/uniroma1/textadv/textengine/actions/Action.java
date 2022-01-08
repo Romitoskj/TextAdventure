@@ -25,8 +25,8 @@ public interface Action {
 
     String execute(List<String> args);
 
-    static String help(List<String> args, Language language) {
-        if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
+    static String help(List<String> args, Language l) {
+        if (args.size() > 1) return l.getAnswer("arg_1");
         ActionFactory actionFactory = Command.getFactory();
         if (args.size() == 1) {
             String actionName = args.get(0).toUpperCase();
@@ -34,7 +34,7 @@ public interface Action {
                 Action a = actionFactory.getAction(actionName);
                 return a.getDescription();
             } catch (ActionNotKnownException e) {
-                return "Non c'è nessun comando chiamato così...";
+                return l.getAnswer("cmd_not_found");
             }
         }
         StringBuilder res = new StringBuilder().append("COMANDO\t\t|\t\tDESCRIZIONE\n\n");
@@ -44,124 +44,124 @@ public interface Action {
         return res.deleteCharAt(res.length() - 1).toString();
     }
 
-    static String quit(List<String> args, Language language) {
-        if (args.size() > 0) return "Questo comando non accetta argomenti.";
-        return "Arrivederci!";
+    static String quit(List<String> args, Language l) {
+        if (args.size() > 0) return l.getAnswer("arg_0");
+        return l.getAnswer("greeting");
     }
 
-    static String look(List<String> args, Language language) {
-        if (args.size() > 1) return "Puoi fornire al massimo un argomento.";
+    static String look(List<String> args, Language l) {
+        if (args.size() > 1) return l.getAnswer("arg_1");
         if (args.size() > 0) {
             try {
-                return getInstance().searchItem(args.get(0)).getDescription(language) + ".";
+                return getInstance().searchItem(args.get(0)).getDescription(l) + ".";
             } catch (ItemNotPresentException e) {
-                return "In questa stanza non c'è nulla del genere.";
+                return l.getAnswer("item_not_found");
             }
         }
-        return getInstance().getPosizione().getDescription(language);
+        return getInstance().getPosizione().getDescription(l);
     }
 
-    static String inventory(List<String> args, Language language) {
-        if (args.size() > 0) return "Questo comando non accetta argomenti.";
-        return getInstance().getInventario(language);
+    static String inventory(List<String> args, Language l) {
+        if (args.size() > 0) return l.getAnswer("arg_0");
+        return getInstance().getInventario(l);
     }
 
-    static String go(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare dove vuoi andare.";
-        if (args.size() > 1) return "Devi specificare un solo argomento.";
+    static String go(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("go_arg_0");
+        if (args.size() > 1) return l.getAnswer("go_too_many_args");
         Link link;
         Direzione dir = Direzione.get(args.get(0));
         if (dir != null) {
             try {
                 link = getInstance().searchLink(dir);
             } catch (ItemNotPresentException e) {
-                return "Non c'è nessun passaggio in questa direzione.";
+                return l.getAnswer("go_d_link_not_found");
             }
         } else {
             try {
                 link = getInstance().searchLink(args.get(0));
             } catch (ItemNotPresentException e) {
-                return "Non c'è nessun passaggio chiamato così.";
+                return l.getAnswer("go_n_link_not_found");
             }
         }
-        if (getInstance().goThrough(link)) return "Sei in %s.".formatted(getInstance().getPosizione().getName());
-        return "Il passaggio %s è chiuso.".formatted(link.getName());
+        if (getInstance().goThrough(link)) return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
+        return l.getAnswer("go_fail").formatted(link.getName());
     }
 
-    static String enter(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare dove vuoi andare.";
-        if (args.size() > 1) return "Devi specificare un solo argomento.";
+    static String enter(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("go_arg_0");
+        if (args.size() > 1) return l.getAnswer("go_too_many_args");
         Link link;
         try {
             link = getInstance().searchLink(args.get(0));
-            if (getInstance().goThrough(link)) return "Sei in %s.".formatted(getInstance().getPosizione().getName());
-            return "Il passaggio è chiuso.";
+            if (getInstance().goThrough(link)) return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
+            return l.getAnswer("go_fail").formatted(link.getName());
         } catch (ItemNotPresentException e) {
-            return "Non c'è nessun passaggio chiamato così.";
+            return l.getAnswer("go_n_link_not_found");
         }
     }
 
-    static String take(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare cosa vuoi prendere.";
-        if (args.size() > 2) return "Devi specificare massimo due argomenti.";
+    static String take(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("take_args_0");
+        if (args.size() > 2) return l.getAnswer("take_too_many_args");
         String name = args.get(0);
-        if (args.size() > 1) return collectFrom(name, args.get(1), language);
+        if (args.size() > 1) return collectFrom(name, args.get(1), l);
         try {
             Item item = getInstance().searchItem(name);
-            if (item instanceof Link) return enter(args, language);
-            if (getInstance().takeFromRoom(name)) return "Oggetto aggiunto all'inventario!";
-            return "Non puoi prenderlo...";
+            if (item instanceof Link) return enter(args, l);
+            if (getInstance().takeFromRoom(name)) return l.getAnswer("take_succ");
+            return l.getAnswer("take_not_storable");
 
         } catch (ItemNotPresentException e) {
-            return "In questa stanza non c'è nulla del genere...";
+            return l.getAnswer("item_not_found");
         }
     }
 
-    private static String collectFrom(String name, String from, Language language) {
+    private static String collectFrom(String name, String from, Language l) {
         try {
             Item item = getInstance().searchItem(from);
-            if (item instanceof Personaggio) return collectFromCharacter(name, (Personaggio) item, language);
-            if (item instanceof Container) return collectFromContainer(name, (Container) item, language);
-            return "%s non è né un contenitore né un personaggio.".formatted(from);
+            if (item instanceof Personaggio) return collectFromCharacter(name, (Personaggio) item, l);
+            if (item instanceof Container) return collectFromContainer(name, (Container) item, l);
+            return l.getAnswer("collect_not_char_cont").formatted(from);
         } catch (ItemNotPresentException e) {
-            return "In questa stanza non c'è nulla del genere...";
+            return l.getAnswer("item_not_found");
         }
     }
 
-    private static String collectFromCharacter(String name, Personaggio p, Language language) {
+    private static String collectFromCharacter(String name, Personaggio p, Language l) {
         try {
             p.dai(name, getInstance());
-            return "%s ti ha dato %s.".formatted(p.getName(), name);
+            return l.getAnswer("take_from_char_succ").formatted(p.getName(), name);
         } catch (ItemNotPresentException e) {
-            return "%s non ha nulla del genere...".formatted(p.getName());
+            return l.getAnswer("take_from_char_fail").formatted(p.getName());
         }
     }
 
-    private static String collectFromContainer(String name, Container container, Language language) {
+    private static String collectFromContainer(String name, Container container, Language l) {
         if (!container.isOpen())
-            return "%s è %s." .formatted(container, (container instanceof Camino ? "acceso" : "chiuso"));
+            return l.getAnswer("take_from_cont_closed").formatted(container,  l.getAnswer((container instanceof Camino ? "lit" : "closed")));
         try {
             Storable toStore = container.takeContent(name);
             if (toStore != null) getInstance().store(toStore);
-            return "Oggetto aggiunto all'inventario!";
+            return l.getAnswer("take_succ");
         } catch (ItemNotPresentException e) {
-            return "%s non contiene %s.".formatted(container.getName(), name);
+            return l.getAnswer("container_fail").formatted(container.getName(), name);
         }
     }
 
-    static String drop(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare l'oggetto da lasciare.";
-        if (args.size() > 1) return "Puoi lasciare solo un oggetto per volta.";
+    static String drop(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("drop_args_0");
+        if (args.size() > 1) return l.getAnswer("drop_too_many_args");
         try {
             getInstance().lascia(args.get(0));
-            return "Oggetto lasciato!";
+            return l.getAnswer("drop_succ");
         } catch (ItemNotPresentException e) {
-            return "Non hai nulla del genere...";
+            return l.getAnswer("not_found_in_inventory");
         }
     }
 
-    static String open(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare cosa vuoi aprire.";
+    static String open(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("open_args_0");
         Lockable toOpen;
         String name = args.get(0);
 
@@ -169,133 +169,133 @@ public interface Action {
         try {
             item = getInstance().searchItem(name);
         } catch (ItemNotPresentException e) {
-            return "In questa stanza non c'è nulla del genere.";
+            return l.getAnswer("item_not_found");
         }
-        if (!(item instanceof Lockable)) return "Non è possibile aprire quest'oggetto.";
+        if (!(item instanceof Lockable)) return l.getAnswer("open_not_loackable");
 
         toOpen = (Lockable) item;
         boolean breakable = item instanceof Breakable;
-        if (toOpen.isOpen()) return "E' già %s!".formatted((breakable ? "rotto" : "aperto"));
+        if (toOpen.isOpen()) return l.getAnswer("open_already_open").formatted(l.getAnswer((breakable ? "broken" : "opened")));
         if (!toOpen.isUnlocked()) {
             if (args.size() < 2)
-                return "Serve qualcosa per %s quest'oggetto...".formatted((breakable ? "rompere" : "aprire"));
+                return l.getAnswer("open_args_1").formatted(l.getAnswer((breakable ? "break" : "open")));
             if (args.size() > 2)
-                return "Devi specificare un solo oggetto che %s il primo.".formatted((breakable ? "rompe" : "apre"));
+                return l.getAnswer("open_too_many_args").formatted(l.getAnswer((breakable ? "break" : "open")));
             try {
                 item = getInstance().getInventoryItem(args.get(1));
             } catch (ItemNotPresentException e) {
-                return "Non hai nulla del genere...";
+                return l.getAnswer("not_found_in_inventory");
             }
-            if (!(item instanceof Opener)) return "Non si %s con quest'oggetto...".formatted((breakable ? "rompe" : "apre"));
+            if (!(item instanceof Opener)) return l.getAnswer("open_wrong_opener").formatted(l.getAnswer((breakable ? "breaks" : "opens")));
             toOpen.unlock((Opener) item);
-            if (!toOpen.isUnlocked()) return "Non si %s con quest'oggetto...".formatted((breakable ? "rompe" : "apre"));
-        } else if (args.size() > 1) return "Non è bloccato, %s e basta!".formatted((breakable ? "rompilo" : "aprilo"));
+            if (!toOpen.isUnlocked()) return l.getAnswer("open_wrong_opener").formatted((breakable ? "breaks" : "opens"));
+        } else if (args.size() > 1) return l.getAnswer("open_unlocked").formatted(l.getAnswer((breakable ? "break_it" : "open_it")));
         toOpen.open();
-        if (toOpen instanceof Camino) return "Spento!";
-        return (breakable? "Rotto!" : "Aperto!");
+        if (toOpen instanceof Camino) return l.getAnswer("fire_succ");
+        return l.getAnswer(breakable? "break_succ" : "open_succ");
     }
 
-    static String breakItem(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare cosa vuoi rompere.";
+    static String breakItem(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("break_args_0");
         if (args.size() > 2)
-            return "Devi specificare solo due oggetti, uno da rompere e uno con cui rompere il primo.";
+            return l.getAnswer("break_too_many_args");
         try {
             Oggetto o = (Oggetto) getInstance().searchItem(args.get(0));
-            if (!(o instanceof Breakable)) return "%s non può essere rotto.".formatted(args.get(0));
-            return open(args, language);
+            if (!(o instanceof Breakable)) return l.getAnswer("break_not_breakable").formatted(args.get(0));
+            return open(args, l);
         } catch (ClassCastException | ItemNotPresentException e) {
-            return "Non c'è nessun oggetto chiamato così qui...";
+            return l.getAnswer("item_not_found");
         }
     }
 
-    static String speak(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare con chi vuoi parlare.";
-        if (args.size() > 1) return "Puoi parlare solo ad un personaggio per volta.";
+    static String speak(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("speak_args_0");
+        if (args.size() > 1) return l.getAnswer("speak_too_many_args");
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
-            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(language));
+            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(l));
         } catch (ClassCastException | ItemNotPresentException e) {
-            return "Non c'è nessuno chiamato così qui...";
+            return l.getAnswer("char_not_found");
         }
     }
 
-    static String pet(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare chi vuoi accarezzare.";
-        if (args.size() > 1) return "Puoi accarezzare solo un animale per volta.";
+    static String pet(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("pet_args_0");
+        if (args.size() > 1) return l.getAnswer("pet_too_many_args");
         try {
             Personaggio personaggio = (Personaggio) getInstance().searchItem(args.get(0));
-            if (!(personaggio instanceof Animal)) return "Non è carino accarezzare una persona che non conosci!";
-            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(language));
+            if (!(personaggio instanceof Animal)) return l.getAnswer("pet_person");
+            return "%s:'%s'".formatted(personaggio.getName(), personaggio.parla(l));
         } catch (ClassCastException | ItemNotPresentException e) {
-            return "Non c'è nessuno chiamato così qui...";
+            return l.getAnswer("char_not_found");
         }
     }
 
-    static String give(List<String> args, Language language) {
-        if (args.size() < 2) return "Devi specificare cosa vuoi dare e a chi.";
-        if (args.size() > 2) return "Devi specificare solamente cosa dare e a chi.";
+    static String give(List<String> args, Language l) {
+        if (args.size() < 2) return l.getAnswer("give_few_args");
+        if (args.size() > 2) return l.getAnswer("give_too_many_args");
         String itemName = args.get(0);
         try {
             Personaggio p = (Personaggio) getInstance().searchItem(args.get(1));
             try {
                 getInstance().dai(itemName, p);
                 if (p instanceof Venditore) {
-                    if (itemName.equals(((Venditore) p).getNeeded())) return "%s ti ha dato secchio e tronchesi.".formatted(p.getName());
+                    if (itemName.equals(((Venditore) p).getNeeded())) return l.getAnswer("give_vendor").formatted(p.getName());
                 }
-                return "%s dato a %s.".formatted(itemName, p.getName());
+                return l.getAnswer("give_succ") .formatted(itemName, p.getName());
             } catch (ItemNotPresentException e) {
-                return "Non hai nulla del genere...";
+                return l.getAnswer("not_found_in_inventory");
             }
         } catch (ClassCastException | ItemNotPresentException e) {
-            return "Non c'è nessuno chiamato così qui...";
+            return l.getAnswer("char_not_found");
         }
     }
 
-    static String use(List<String> args, Language language) {
-        if (args.size() == 0) return "Devi specificare cosa vuoi usare.";
+    static String use(List<String> args, Language l) {
+        if (args.size() == 0) return l.getAnswer("use_args_0");
         Item item, link;
         try {
             item = getInstance().getInventoryItem(args.get(0));
             if (item instanceof Opener) {
-                if (args.size() < 2) return "Devi specificare su cosa usare l'oggetto.";
-                if (args.size() > 2) return "Puoi specificare massimo due oggetti.";
+                if (args.size() < 2) return l.getAnswer("use_args_1");
+                if (args.size() > 2) return l.getAnswer("use_too_many_args");
                 try {
                     link = getInstance().searchItem(args.get(1));
                 } catch (ItemNotPresentException e) {
-                    return "Non c'è nulla chiamato così su cui usare l'oggetto.";
+                    return l.getAnswer("use_not_found");
                 }
                 if (item instanceof Secchio) {
                     Secchio secchio = (Secchio) item;
                     if (!secchio.isPieno() && !(link instanceof Lockable))
-                        return riempi(secchio, args.get(1), language);
+                        return riempi(secchio, args.get(1), l);
                 }
                 if (link instanceof Teletrasporto) {
                     Teletrasporto t = (Teletrasporto) link;
-                    String open = open(List.of(args.get(1), args.get(0)), language);
-                    if (t.isOpen()) return go(List.of(t.getName()), language);
+                    String open = open(List.of(args.get(1), args.get(0)), l);
+                    if (t.isOpen()) return go(List.of(t.getName()), l);
                     return open;
                 }
-                return open(List.of(args.get(1), args.get(0)), language);
+                return open(List.of(args.get(1), args.get(0)), l);
             }
-            return "Sembra non faccia nulla...";
+            return l.getAnswer("use_fail");
         } catch (ItemNotPresentException e) {
             try {
                 getInstance().searchLink(args.get(0));
-                return go(args, language);
+                return go(args, l);
             } catch (ItemNotPresentException ex) {
-                return "Non hai nulla del genere e non c'è un passaggio chiamato così...";
+                return l.getAnswer("use_not_found_inventory");
             }
         }
     }
 
-    private static String riempi(Secchio s, String arg, Language language) {
+    private static String riempi(Secchio s, String arg, Language l) {
         try {
             s.riempi((Pozzo) getInstance().searchItem(arg));
-            return "Secchio riempito!";
+            return l.getAnswer("fill_succ");
         } catch (ItemNotPresentException e) {
-            return "In questa stanza non c'è nulla del genere...";
+            return l.getAnswer("item_not_found");
         } catch (ClassCastException e) {
-            return "Puoi riempire il secchio solo al pozzo...";
+            return l.getAnswer("fill_fail");
         }
     }
 

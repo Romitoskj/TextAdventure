@@ -6,11 +6,11 @@ package it.uniroma1.textadv.exceptions;
  */
 public class PlayerNotInitializedException extends RuntimeException {
 
-	/**
-	 * Crea una NotInitializedPlayerException.
-	 */
-	public PlayerNotInitializedException() {
-		super("You have to initialize the player first.");
-	}
-	
+    /**
+     * Crea una NotInitializedPlayerException.
+     */
+    public PlayerNotInitializedException() {
+        super("You have to initialize the player first.");
+    }
+
 }

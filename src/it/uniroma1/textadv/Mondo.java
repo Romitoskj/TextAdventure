@@ -101,20 +101,10 @@ public class Mondo {
      *
      * @param percorso stringa del percorso del file
      * @return un mondo di gioco
-     * @throws IOException                     se occorre un errore I/O leggendo il file
-     * @throws WronglyFormattedFileException   se il file .game non è formattato correttamente
-     * @throws RoomNotPresentException         se un link prova a collegare una stanza non presente
-     * @throws RoomWithoutDescriptionException se non viene fornita la descrizione di una stanza
-     * @throws ClassNotFoundException          se non viene trovata la classe corrispondente a un item
-     * @throws InvocationTargetException       se la costruzione di un item solleva un eccezione
-     * @throws NoSuchMethodException           se il costruttore di un item non viene trovato
-     * @throws InstantiationException          se un item non può essere creato
-     * @throws IllegalAccessException          se non il metodo non ha accesso alla definizione di un item
-     * @throws ItemInMultipleRoomsException    se un item viene inserito in più stanze (nel caso dei link più di due stanze)
-     * @throws ItemAlreadyCreated              se viene creato un item con il nome di uno già
-     * @throws RoomWithoutLinksException       se viene creata una stanza senza nemmeno un link
+     * @throws IOException                se occorre un errore I/O leggendo il file
+     * @throws MalformedGameFileException se il file .game non è formattato correttamente
      */
-    public static Mondo fromFile(String percorso) throws IOException, WronglyFormattedFileException, RoomNotPresentException, RoomWithoutDescriptionException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemInMultipleRoomsException, ItemAlreadyCreated, RoomWithoutLinksException {
+    public static Mondo fromFile(String percorso) throws IOException, MalformedGameFileException {
         return fromFile(Path.of(percorso));
     }
 
@@ -123,20 +113,13 @@ public class Mondo {
      *
      * @param path - {@link Path} del percorso del file
      * @return un mondo di gioco
-     * @throws IOException                     se occorre un errore I/O leggendo il file
-     * @throws WronglyFormattedFileException   se il file .game non è formattato correttamente
-     * @throws RoomNotPresentException         se un link prova a collegare una stanza non presente
-     * @throws RoomWithoutDescriptionException se non viene fornita la descrizione di una stanza
-     * @throws ClassNotFoundException          se non viene trovata la classe corrispondente a un item
-     * @throws InvocationTargetException       se la costruzione di un item solleva un eccezione
-     * @throws NoSuchMethodException           se il costruttore di un item non viene trovato
-     * @throws InstantiationException          se un item non può essere creato
-     * @throws IllegalAccessException          se non il metodo non ha accesso alla definizione di un item
-     * @throws ItemInMultipleRoomsException    se un item viene inserito in più stanze (nel caso dei link più di due stanze)
-     * @throws ItemAlreadyCreated              se viene creato un item con il nome di uno già presente
-     * @throws RoomWithoutLinksException       se viene creata una stanza senza nemmeno un link
+     * @throws IOException                se occorre un errore I/O leggendo il file
+     * @throws MalformedGameFileException se il file .game non è formattato correttamente
      */
-    public static Mondo fromFile(Path path) throws IOException, WronglyFormattedFileException, RoomNotPresentException, RoomWithoutDescriptionException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemInMultipleRoomsException, ItemAlreadyCreated, RoomWithoutLinksException {
+    public static Mondo fromFile(Path path) throws IOException, MalformedGameFileException {
+        if (!path.toString().endsWith(".game"))
+            throw new IOException("The file '%s' is not a .game file.".formatted(path));
+
         String sectionType, sectionInfo = null, playerText = null, start = null;
         List<String> charactersText = null, objectsText = null, linksText = null, text = Files.readAllLines(path);
         Map<String, List<String>> roomsText = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -151,18 +134,18 @@ public class Mondo {
             switch (sectionType) {
                 case "world" -> {
                     String name = null, description = null;
-                    if (section.size() == 0) throw new WronglyFormattedFileException();
+                    if (section.size() == 0) throw new MalformedGameFileException("World section is empty.");
                     for (String line : section) {
                         name = sectionInfo;
                         try {
                             if (line.startsWith("description")) description = line.split("\t")[1];
                             else if (line.startsWith("start")) start = line.split("\t")[1];
                         } catch (IndexOutOfBoundsException e) {
-                            throw new WronglyFormattedFileException();
+                            throw new MalformedGameFileException("World section without description or start.");
                         }
                     }
                     if (name == null || name.equals("") || description == null || description.equals("") || start == null || start.equals(""))
-                        throw new WronglyFormattedFileException();
+                        throw new MalformedGameFileException("World section has not all the information needed.");
                     INSTANCE = new Mondo(name, description);
                 }
                 case "characters" -> charactersText = section;
@@ -170,14 +153,15 @@ public class Mondo {
                 case "objects" -> objectsText = section;
                 case "player" -> playerText = section.get(0);
                 case "room" -> {
-                    if (roomsText.get(sectionInfo) != null) throw new ItemAlreadyCreated(sectionInfo);
+                    if (roomsText.get(sectionInfo) != null)
+                        throw new MalformedGameFileException("the room %s appears more than one time.".formatted(sectionInfo));
                     roomsText.put(sectionInfo, section);
                 }
             }
         }
 
         if (linksText == null || objectsText == null || charactersText == null || playerText == null || roomsText.isEmpty()) {
-            throw new WronglyFormattedFileException();
+            throw new MalformedGameFileException("The file must have all the world section.");
         }
 
         try {
@@ -188,17 +172,17 @@ public class Mondo {
             INSTANCE.initLinks();
             INSTANCE.createPlayer(playerText, start);
             return INSTANCE;
-        } catch (NullPointerException e) {
-            throw new WronglyFormattedFileException(); // se manca la sezione "world"
+        } catch (NullPointerException e) { // se manca la sezione "world"
+            throw new MalformedGameFileException("The file must have all the world section.");
         }
     }
 
-    private void initLinks() throws RoomNotPresentException {
+    private void initLinks() throws MalformedGameFileException {
         Stanza s1, s2;
         for (Link link : LINKS.values()) {
             s1 = STANZE.get(link.getSTANZA1());
             s2 = STANZE.get(link.getSTANZA2());
-            if (s1 == null || s2 == null) throw new RoomNotPresentException();
+            if (s1 == null || s2 == null) throw new MalformedGameFileException("Link must connect two existing rooms.");
             link.init(s1, s2);
         }
     }
@@ -223,80 +207,122 @@ public class Mondo {
         return sections;
     }
 
-    private void createPlayer(String playerText, String start) throws WronglyFormattedFileException {
+    private void createPlayer(String playerText, String start) throws MalformedGameFileException {
         String[] info = playerText.split("\\t");
         if (info[0].equals("") || info.length < 2 || !info[1].equals("Giocatore"))
-            throw new WronglyFormattedFileException();
+            throw new MalformedGameFileException("Player section is empty.");
         Giocatore.init(info[0], STANZE.get(start));
     }
 
-    private Link createLink(String linkText) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, WronglyFormattedFileException {
+    private Link createLink(String linkText) throws MalformedGameFileException {
         String[] linkInfo = linkText.split("\\t");
-        if (linkInfo.length < 4) throw new WronglyFormattedFileException();
-        String name = linkInfo[0], stanza1 = linkInfo[2], stanza2 = linkInfo[3];
-        Class<?> c = Class.forName("it.uniroma1.textadv.links." + linkInfo[1]);
-        Class<? extends Link> linkCls = c.asSubclass(Link.class);
-        Constructor<? extends Link> constr = linkCls.getConstructor(String.class, String.class, String.class);
-        return constr.newInstance(name, stanza1, stanza2);
+        if (linkInfo.length < 4)
+            throw new MalformedGameFileException("The link '%s' has not all the information needed.".formatted(linkInfo[0]));
+        String name = linkInfo[0], stanza1 = linkInfo[2], stanza2 = linkInfo[3], classe = "it.uniroma1.textadv.links." + linkInfo[1];
+        Class<?> c;
+        try {
+            c = Class.forName(classe);
+            Class<? extends Link> linkCls = c.asSubclass(Link.class);
+            Constructor<? extends Link> constr = linkCls.getConstructor(String.class, String.class, String.class);
+            return constr.newInstance(name, stanza1, stanza2);
+        } catch (ClassNotFoundException e) {
+            throw new MalformedGameFileException("The class '%s' does not exist".formatted(classe));
+        } catch (InvocationTargetException e) {
+            throw new MalformedGameFileException("The constructor of the class '%s' has thrown an exception".formatted(classe));
+        } catch (NoSuchMethodException e) {
+            throw new MalformedGameFileException("The constructor of class '%s' does not exist".formatted(classe));
+        } catch (InstantiationException e) {
+            throw new MalformedGameFileException("The class '%s' can not be instantiated".formatted(classe));
+        } catch (IllegalAccessException e) {
+            throw new MalformedGameFileException("This method has not access to the constructor of class '%s' ".formatted(classe));
+        }
     }
 
-    private Oggetto createOggetto(String oggettoText) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, WronglyFormattedFileException {
-        Oggetto oggetto;
+    private Oggetto createOggetto(String oggettoText) throws MalformedGameFileException {
         String[] oggettoInfo = oggettoText.split("\\t");
-        String name = oggettoInfo[0], param;
+        if (name.equals("") || oggettoInfo.length < 2)
+            throw new MalformedGameFileException("The object '%s' has not all the information needed.".formatted(oggettoInfo[0]));
+        String name = oggettoInfo[0], param, classe = "it.uniroma1.textadv.oggetti." + oggettoInfo[1];
         Link l;
-        if (name.equals("") || oggettoInfo.length < 2) throw new WronglyFormattedFileException();
-        Class<?> c = Class.forName("it.uniroma1.textadv.oggetti." + oggettoInfo[1]);
-        Class<? extends Oggetto> oggettoCls = c.asSubclass(Oggetto.class);
-        Constructor<? extends Oggetto> constr;
-        if (oggettoInfo.length > 2) {
-            param = oggettoInfo[2];
-            constr = oggettoCls.getConstructor(String.class, String.class);
-            oggetto = constr.newInstance(name, param);
-            if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.Opener"))) {
-                l = LINKS.get(param);
-                if (l != null) // se oggetto è un opener di un link (param chiave in link)
-                    l.lock((Opener) oggetto);
+        Oggetto oggetto;
+        try {
+            Class<?> c = Class.forName(classe);
+            Class<? extends Oggetto> oggettoCls = c.asSubclass(Oggetto.class);
+            Constructor<? extends Oggetto> constr;
+            if (oggettoInfo.length > 2) {
+                param = oggettoInfo[2];
+                constr = oggettoCls.getConstructor(String.class, String.class);
+                oggetto = constr.newInstance(name, param);
+                if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.Opener"))) {
+                    l = LINKS.get(param);
+                    if (l != null) // se oggetto è un opener di un link (param chiave in link)
+                        l.lock((Opener) oggetto);
+                }
+            } else {
+                constr = oggettoCls.getConstructor(String.class);
+                oggetto = constr.newInstance(name);
             }
-        } else {
-            constr = oggettoCls.getConstructor(String.class);
-            oggetto = constr.newInstance(name);
+            return oggetto;
+        } catch (ClassNotFoundException e) {
+            throw new MalformedGameFileException("The class '%s' does not exist".formatted(classe));
+        } catch (InvocationTargetException e) {
+            throw new MalformedGameFileException("The constructor of the class '%s' has thrown an exception".formatted(classe));
+        } catch (NoSuchMethodException e) {
+            throw new MalformedGameFileException("The constructor of class '%s' does not exist".formatted(classe));
+        } catch (InstantiationException e) {
+            throw new MalformedGameFileException("The class '%s' can not be instantiated".formatted(classe));
+        } catch (IllegalAccessException e) {
+            throw new MalformedGameFileException("This method has not access to the constructor of class '%s' ".formatted(classe));
         }
-        return oggetto;
     }
 
-    private Personaggio createPersonaggio(String personaggioText) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, WronglyFormattedFileException {
-        Personaggio p;
+    private Personaggio createPersonaggio(String personaggioText) throws MalformedGameFileException {
         String[] personaggioInfo = personaggioText.split("\\t");
-        String name = personaggioInfo[0];
-        if (name.equals("") || personaggioInfo.length < 2) throw new WronglyFormattedFileException();
-        Class<?> c = Class.forName("it.uniroma1.textadv.personaggi." + personaggioInfo[1]);
-        Class<? extends Personaggio> linkCls = c.asSubclass(Personaggio.class);
-        Constructor<? extends Personaggio> constr;
-        if (personaggioInfo.length < 3) {
-            constr = linkCls.getConstructor(String.class);
-            p = constr.newInstance(name);
-        } else {
-            constr = linkCls.getConstructor(String.class, String[].class);
-            p = constr.newInstance(name, Arrays.copyOfRange(personaggioInfo, 2, personaggioInfo.length));
+        if (name.equals("") || personaggioInfo.length < 2)
+            throw new MalformedGameFileException("The character '%s' has not all the information needed.".formatted(personaggioInfo[0]));
+        String name = personaggioInfo[0], classe = "it.uniroma1.textadv.personaggi." + personaggioInfo[1];
+        Personaggio p;
+        try {
+            Class<?> c = Class.forName(classe);
+            Class<? extends Personaggio> linkCls = c.asSubclass(Personaggio.class);
+            Constructor<? extends Personaggio> constr;
+            if (personaggioInfo.length < 3) {
+                constr = linkCls.getConstructor(String.class);
+                p = constr.newInstance(name);
+            } else {
+                constr = linkCls.getConstructor(String.class, String[].class);
+                p = constr.newInstance(name, Arrays.copyOfRange(personaggioInfo, 2, personaggioInfo.length));
+            }
+            return p;
+        } catch (ClassNotFoundException e) {
+            throw new MalformedGameFileException("The class '%s' does not exist".formatted(classe));
+        } catch (InvocationTargetException e) {
+            throw new MalformedGameFileException("The constructor of the class '%s' has thrown an exception".formatted(classe));
+        } catch (NoSuchMethodException e) {
+            throw new MalformedGameFileException("The constructor of class '%s' does not exist".formatted(classe));
+        } catch (InstantiationException e) {
+            throw new MalformedGameFileException("The class '%s' can not be instantiated".formatted(classe));
+        } catch (IllegalAccessException e) {
+            throw new MalformedGameFileException("This method has not access to the constructor of class '%s' ".formatted(classe));
         }
-        return p;
     }
 
-    private void readLinks(List<String> linksText) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemAlreadyCreated, WronglyFormattedFileException {
+    private void readLinks(List<String> linksText) throws MalformedGameFileException {
         Link link;
         for (String linkText : linksText) {
             link = createLink(linkText);
-            if (getItem(link.getName()) != null) throw new ItemAlreadyCreated(link.getName());
+            if (getItem(link.getName()) != null)
+                throw new MalformedGameFileException("The link '%s' appears more than one time in the links section.".formatted(link.getName()));
             LINKS.put(link.getName(), link);
         }
     }
 
-    private void readObjects(List<String> objectsText) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemAlreadyCreated, WronglyFormattedFileException {
+    private void readObjects(List<String> objectsText) throws MalformedGameFileException {
         Oggetto oggetto;
         for (String oggettoText : objectsText) {
             oggetto = createOggetto(oggettoText);
-            if (getItem(oggetto.getName()) != null) throw new ItemAlreadyCreated(oggetto.getName());
+            if (getItem(oggetto.getName()) != null)
+                throw new MalformedGameFileException("The object '%s' appears more than one time in the objects section.".formatted(oggetto.getName()));
             OGGETTI.put(oggetto.getName(), oggetto);
         }
         Container container;
@@ -314,16 +340,17 @@ public class Mondo {
         }
     }
 
-    private void readCharacters(List<String> charactersText) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ItemAlreadyCreated, WronglyFormattedFileException {
+    private void readCharacters(List<String> charactersText) throws MalformedGameFileException {
         Personaggio personaggio;
         for (String personaggioText : charactersText) {
             personaggio = createPersonaggio(personaggioText);
-            if (getItem(personaggio.getName()) != null) throw new ItemAlreadyCreated(personaggio.getName());
+            if (getItem(personaggio.getName()) != null)
+                throw new MalformedGameFileException("The character '%s' appears more than one time in the characters section.".formatted(personaggio.getName()));
             PERSONAGGI.put(personaggio.getName(), personaggio);
         }
     }
 
-    private void readRooms(Map<String, List<String>> roomsText) throws RoomWithoutDescriptionException, ItemInMultipleRoomsException, ItemAlreadyCreated, RoomWithoutLinksException {
+    private void readRooms(Map<String, List<String>> roomsText) throws MalformedGameFileException {
         Map<String, Personaggio> charToIns = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Oggetto> objToIns = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Integer> linkToIns = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -338,23 +365,25 @@ public class Mondo {
         Personaggio pers;
         Oggetto ogg;
         int l;
-        boolean hasNotlinks;
+        boolean hasNotLinks;
 
         for (String nome : roomsText.keySet()) {
-            if (STANZE.get(nome) != null) throw new ItemAlreadyCreated(nome);
-            hasNotlinks = true;
+            if (STANZE.get(nome) != null)
+                throw new MalformedGameFileException("The room '%s' appears more than one time.".formatted(nome));
+            hasNotLinks = true;
             text = roomsText.get(nome);
             for (String line : text) {
                 if (line.startsWith("description")) {
                     try {
                         builder = new Stanza.Builder(nome, line.split("\\t")[1]);
                     } catch (IndexOutOfBoundsException e) {
-                        throw new RoomWithoutDescriptionException();
+                        throw new MalformedGameFileException("The room '%s' has not a description.".formatted(nome));
                     }
                     break;
                 }
             }
-            if (builder == null) throw new RoomWithoutDescriptionException();
+            if (builder == null)
+                throw new MalformedGameFileException("The room '%s' has not a description.".formatted(nome));
             for (String line : text) {
                 lineText = line.split("\\t");
                 if (lineText.length > 1) {
@@ -362,19 +391,21 @@ public class Mondo {
                         case "objects" -> {
                             for (String oggetto : lineText[1].split(",")) {
                                 ogg = objToIns.remove(oggetto.strip());
-                                if (ogg == null) throw new ItemInMultipleRoomsException(oggetto);
-                                builder.addOggetto(ogg);
+                                if (ogg == null)
+                                    throw new MalformedGameFileException("The object '%s' appears in more than one room.".formatted(oggetto));
+                                builder = builder.addOggetto(ogg);
                             }
                         }
                         case "characters" -> {
                             for (String personaggio : lineText[1].split(",")) {
                                 pers = charToIns.remove(personaggio.strip());
-                                if (pers == null) throw new ItemInMultipleRoomsException(personaggio);
-                                builder.addPersonaggio(pers);
+                                if (pers == null)
+                                    throw new MalformedGameFileException("The object '%s' appears in more than one room.".formatted(personaggio));
+                                builder = builder.addPersonaggio(pers);
                             }
                         }
                         case "links" -> {
-                            hasNotlinks = false;
+                            hasNotLinks = false;
                             for (String dirLink : lineText[1].split(",")) {
                                 linkArray = dirLink.strip().split(":");
                                 dir = Direzione.get(linkArray[0]);
@@ -385,15 +416,16 @@ public class Mondo {
                                     LINKS.put(nome, new Link(nome, linkArray[1], nome));
                                 } else {
                                     l = linkToIns.merge(linkArray[1], 1, (o, n) -> o - n);
-                                    if (l < 0) throw new ItemInMultipleRoomsException(linkArray[1]);
+                                    if (l < 0)
+                                        throw new MalformedGameFileException("The link '%s' appears in more than two rooms.".formatted(linkArray[1]));
                                 }
-                                builder.addLink(dir, link);
+                                builder = builder.addLink(dir, link);
                             }
                         }
                     }
                 }
             }
-            if (hasNotlinks) throw new RoomWithoutLinksException(nome);
+            if (hasNotLinks) throw new MalformedGameFileException("The room '%s' has not links.".formatted(nome));
             STANZE.put(nome, builder.build());
         }
     }
