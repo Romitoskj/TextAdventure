@@ -38,7 +38,7 @@ public class Tesoro extends Oggetto implements Storable, Subject {
     }
 
     @Override
-    public void notificaObservers() {
+    public void notifyObservers() {
         observers.forEach(Observer::update);
     }
 

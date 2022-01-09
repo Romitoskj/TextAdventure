@@ -7,6 +7,9 @@ import it.uniroma1.textadv.textengine.languages.Language;
 import java.util.List;
 import java.util.function.BiFunction;
 
+/**
+ * Enumerazione contenente delle azioni in italiano.
+ */
 public enum ITAction implements Action {
 
     AIUTO(Action::help, "\t\t\tVisualizza la lista dei comandi o un comando specifico."),
@@ -38,8 +41,14 @@ public enum ITAction implements Action {
 
     ACCAREZZA(Action::pet, "\t\tUsalo per accarezzare un animale.");
 
+    /**
+     * Descrizione dell'azione.
+     */
     private final String DESCRIPTION;
 
+    /**
+     * Metodo che viene eseguito quando viene eseguita l'azione.
+     */
     private final BiFunction<List<String>, Language, String> method;
 
     ITAction(BiFunction<List<String>, Language, String> method, String description) {
@@ -57,7 +66,12 @@ public enum ITAction implements Action {
         return method.apply(args, EnglishAndItalian.IT);
     }
 
-    public static ActionFactory getFactory () {
+    /**
+     * Restituisce l'{@link ActionFactory} che permette di ottenere le azioni definite in questa enumerazione.
+     *
+     * @return la factory per le azioni italiane
+     */
+    public static ActionFactory getFactory() {
         return new ActionFactory() {
             @Override
             public Action getAction(String name) throws ActionNotKnownException {

@@ -178,9 +178,9 @@ public class Giocatore extends Personaggio implements Subject {
         if (!(item instanceof Storable)) return false;
         if (item instanceof Subject) {
             Subject subject = (Subject) item;
-            subject.notificaObservers();
+            subject.notifyObservers();
             if (subject.hasObservers()) return false;
-            if (subject instanceof Tesoro) notificaObservers();
+            if (subject instanceof Tesoro) notifyObservers();
         }
         posizione.remove(nome);
         store((Storable) item);
@@ -207,7 +207,7 @@ public class Giocatore extends Personaggio implements Subject {
     }
 
     @Override
-    public void notificaObservers() {
+    public void notifyObservers() {
         observers.forEach(Observer::update);
     }
 

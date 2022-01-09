@@ -23,10 +23,25 @@ import java.util.List;
 
 import static it.uniroma1.textadv.personaggi.Giocatore.getInstance;
 
+/**
+ * Rappresenta un'azione che il giocatore può effettuare. Un'azione può essere eseguita fornendo o meno degli argomenti.
+ * L'esecuzione di un'azione restituisce un riscontro testuale del successo o meno di essa.
+ */
 public interface Action {
 
+    /**
+     * Restituisce la descrizione dell'azione in forma di stringa.
+     *
+     * @return la descrizione
+     */
     String getDescription();
 
+    /**
+     * Esegue l'azione con i parametri forniti.
+     *
+     * @param args lista dei parametri dell'azione sotto forma di stringa (la lista può essere vuota)
+     * @return il riscontro dell'esecuzione dell'azione
+     */
     String execute(List<String> args);
 
     static String help(List<String> args, Language l) {
@@ -88,7 +103,8 @@ public interface Action {
                 return l.getAnswer("go_n_link_not_found");
             }
         }
-        if (getInstance().goThrough(link)) return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
+        if (getInstance().goThrough(link))
+            return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
         return l.getAnswer("go_fail").formatted(link.getName());
     }
 
@@ -98,7 +114,8 @@ public interface Action {
         Link link;
         try {
             link = getInstance().searchLink(args.get(0));
-            if (getInstance().goThrough(link)) return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
+            if (getInstance().goThrough(link))
+                return l.getAnswer("go_succ").formatted(getInstance().getPosizione().getName());
             return l.getAnswer("go_fail").formatted(link.getName());
         } catch (ItemNotPresentException e) {
             return l.getAnswer("go_n_link_not_found");
@@ -143,7 +160,7 @@ public interface Action {
 
     private static String collectFromContainer(String name, Container container, Language l) {
         if (!container.isOpen())
-            return l.getAnswer("take_from_cont_closed").formatted(container,  l.getAnswer((container instanceof Camino ? "lit" : "closed")));
+            return l.getAnswer("take_from_cont_closed").formatted(container, l.getAnswer((container instanceof Camino ? "lit" : "closed")));
         try {
             Storable toStore = container.takeContent(name);
             if (toStore != null) getInstance().store(toStore);
@@ -179,7 +196,8 @@ public interface Action {
 
         toOpen = (Lockable) item;
         boolean breakable = item instanceof Breakable;
-        if (toOpen.isOpen()) return l.getAnswer("open_already_open").formatted(l.getAnswer((breakable ? "broken" : "opened")));
+        if (toOpen.isOpen())
+            return l.getAnswer("open_already_open").formatted(l.getAnswer((breakable ? "broken" : "opened")));
         if (!toOpen.isUnlocked()) {
             if (args.size() < 2)
                 return l.getAnswer("open_args_1").formatted(l.getAnswer((breakable ? "break" : "open")));
@@ -190,13 +208,16 @@ public interface Action {
             } catch (ItemNotPresentException e) {
                 return l.getAnswer("not_found_in_inventory");
             }
-            if (!(item instanceof Opener)) return l.getAnswer("open_wrong_opener").formatted(l.getAnswer((breakable ? "breaks" : "opens")));
+            if (!(item instanceof Opener))
+                return l.getAnswer("open_wrong_opener").formatted(l.getAnswer((breakable ? "breaks" : "opens")));
             toOpen.unlock((Opener) item);
-            if (!toOpen.isUnlocked()) return l.getAnswer("open_wrong_opener").formatted((breakable ? "breaks" : "opens"));
-        } else if (args.size() > 1) return l.getAnswer("open_unlocked").formatted(l.getAnswer((breakable ? "break_it" : "open_it")));
+            if (!toOpen.isUnlocked())
+                return l.getAnswer("open_wrong_opener").formatted((breakable ? "breaks" : "opens"));
+        } else if (args.size() > 1)
+            return l.getAnswer("open_unlocked").formatted(l.getAnswer((breakable ? "break_it" : "open_it")));
         toOpen.open();
         if (toOpen instanceof Camino) return l.getAnswer("fire_succ");
-        return l.getAnswer(breakable? "break_succ" : "open_succ");
+        return l.getAnswer(breakable ? "break_succ" : "open_succ");
     }
 
     static String breakItem(List<String> args, Language l) {
@@ -244,9 +265,10 @@ public interface Action {
             try {
                 getInstance().dai(itemName, p);
                 if (p instanceof Venditore) {
-                    if (itemName.equals(((Venditore) p).getNeeded())) return l.getAnswer("give_vendor").formatted(p.getName());
+                    if (itemName.equals(((Venditore) p).getNeeded()))
+                        return l.getAnswer("give_vendor").formatted(p.getName());
                 }
-                return l.getAnswer("give_succ") .formatted(itemName, p.getName());
+                return l.getAnswer("give_succ").formatted(itemName, p.getName());
             } catch (ItemNotPresentException e) {
                 return l.getAnswer("not_found_in_inventory");
             }

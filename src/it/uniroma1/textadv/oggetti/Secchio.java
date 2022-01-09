@@ -61,7 +61,7 @@ public class Secchio extends Opener implements Storable, Subject {
     }
 
     @Override
-    public void notificaObservers() {
+    public void notifyObservers() {
         observers.forEach(Observer::update);
     }
 

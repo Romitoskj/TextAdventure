@@ -7,6 +7,9 @@ import it.uniroma1.textadv.textengine.languages.Language;
 import java.util.List;
 import java.util.function.BiFunction;
 
+/**
+ * Enumerazione contenente delle azioni in inglese.
+ */
 public enum ENAction implements Action {
 
     HELP(Action::help, "\t\t\tDisplay the actions list or a specific action description."),
@@ -39,8 +42,14 @@ public enum ENAction implements Action {
 
     PET(Action::pet, "\t\t\t\tPets an animal.");
 
+    /**
+     * Descrizione dell'azione.
+     */
     private final String DESCRIPTION;
 
+    /**
+     * Metodo che viene eseguito quando viene eseguita l'azione.
+     */
     private final BiFunction<List<String>, Language, String> method;
 
     ENAction(BiFunction<List<String>, Language, String> method, String description) {
@@ -58,7 +67,12 @@ public enum ENAction implements Action {
         return method.apply(args, EnglishAndItalian.EN);
     }
 
-    public static ActionFactory getFactory () {
+    /**
+     * Restituisce l'{@link ActionFactory} che permette di ottenere le azioni definite in questa enumerazione.
+     *
+     * @return la factory per le azioni inglesi
+     */
+    public static ActionFactory getFactory() {
         return new ActionFactory() {
             @Override
             public Action getAction(String name) throws ActionNotKnownException {

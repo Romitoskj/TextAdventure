@@ -27,12 +27,12 @@ public class Command {
 
 
     /**
-     * Lingua in cui vengono localizzati i comandi. Predefinito italiano.
+     * Lingua in cui vengono localizzati i comandi. La lingua predefinita è l'italiano.
      */
     private static Language language = EnglishAndItalian.IT;
 
     /**
-     * Action factory con cui ottenere le varie azioni. Predefinita quella fornita dalla lingua italiana.
+     * Action factory con cui ottenere le varie azioni. Quella predefinita viene fornita dalla lingua italiana.
      */
     private static ActionFactory factory = EnglishAndItalian.IT.getActionFactory();
 
@@ -80,6 +80,11 @@ public class Command {
         Command.factory = factory;
     }
 
+    /**
+     * Restituisci la factory delle azioni.
+     *
+     * @return l'action factory
+     */
     public static ActionFactory getFactory() {
         return factory;
     }
@@ -110,7 +115,7 @@ public class Command {
         return new Command(action, findArgs(new ArrayList<>(args)));
     }
 
-    private static List<String> findArgs(List<String> args){
+    private static List<String> findArgs(List<String> args) {
         List<String> realArgs = new ArrayList<>();
         Item item;
         Direzione dir;

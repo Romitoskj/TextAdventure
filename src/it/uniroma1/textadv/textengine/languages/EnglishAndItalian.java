@@ -10,13 +10,16 @@ import java.util.Set;
 
 import static java.util.Map.entry;
 
+/**
+ * Enumerazione che contiene la lingua italiana e inglese.
+ */
 public enum EnglishAndItalian implements Language {
 
     EN(ENAction.getFactory(),
             Set.of("a", "an", "the", "about", "above", "against", "across", "along", "around", "among", "before", "at",
-            "behind", "beneath", "below", "beside", "beyond", "between", "by", "during", "down", "except", "from",
-            "for", "inside", "in", "into", "near", "like", "of", "on", "to", "since", "toward", "under", "though", "up",
-            "until", "upon", "within", "with", "and"),
+                    "behind", "beneath", "below", "beside", "beyond", "between", "by", "during", "down", "except", "from",
+                    "for", "inside", "in", "into", "near", "like", "of", "on", "to", "since", "toward", "under", "though", "up",
+                    "until", "upon", "within", "with", "and"),
             Map.<String, String>ofEntries(
                     entry("start", """
                             You are  %s and your goal is to find the hidden treasure.
@@ -98,9 +101,9 @@ public enum EnglishAndItalian implements Language {
 
     IT(ITAction.getFactory(),
             Set.of("il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "di", "del", "dello", "della", "dei", "degli",
-            "delle", "a", "al", "allo", "alla", "ai", "agli", "alle", "da", "dal", "dallo", "dalla", "dai", "dagli",
-            "dalle", "in", "nel", "nello", "nella", "nei", "negli", "nelle", "su", "sul", "sullo", "sulla", "sui",
-            "sugli", "sulle", "con", "dentro"),
+                    "delle", "a", "al", "allo", "alla", "ai", "agli", "alle", "da", "dal", "dallo", "dalla", "dai", "dagli",
+                    "dalle", "in", "nel", "nello", "nella", "nei", "negli", "nelle", "su", "sul", "sullo", "sulla", "sui",
+                    "sugli", "sulle", "con", "dentro"),
             Map.<String, String>ofEntries(
                     entry("start", """
                             Sei %s e il tuo obbiettivo è trovare il tesoro nascosto.
@@ -181,10 +184,19 @@ public enum EnglishAndItalian implements Language {
             )
     );
 
+    /**
+     * Insieme delle stop word.
+     */
     private final Set<String> STOP_WORDS;
 
+    /**
+     * Mappa dei riscontri testuali delle azioni.
+     */
     private final Map<String, String> ANSWERS;
 
+    /**
+     * {@link ActionFactory} delle azioni relative alla lingua.
+     */
     private final ActionFactory actionFactory;
 
     EnglishAndItalian(ActionFactory actionFactory, Set<String> stop_words, Map<String, String> answers) {
@@ -208,6 +220,11 @@ public enum EnglishAndItalian implements Language {
         return ANSWERS.get(key);
     }
 
+    /**
+     * Restituisce la {@link LanguageFactory} che può restituire la lingua italiana e inglese.
+     *
+     * @return la language factory
+     */
     public static LanguageFactory getFactory() {
         return languageName -> {
             try {
