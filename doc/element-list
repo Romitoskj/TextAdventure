@@ -1,0 +1,14 @@
+it.uniroma1.textadv
+it.uniroma1.textadv.exceptions
+it.uniroma1.textadv.interfaces
+it.uniroma1.textadv.links
+it.uniroma1.textadv.links.exceptions
+it.uniroma1.textadv.oggetti
+it.uniroma1.textadv.oggetti.interfaces
+it.uniroma1.textadv.personaggi
+it.uniroma1.textadv.personaggi.exceptions
+it.uniroma1.textadv.personaggi.interfaces
+it.uniroma1.textadv.textengine
+it.uniroma1.textadv.textengine.actions
+it.uniroma1.textadv.textengine.exceptions
+it.uniroma1.textadv.textengine.languages
