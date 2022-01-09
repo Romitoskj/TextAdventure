@@ -103,10 +103,10 @@ public enum EnglishAndItalian implements Language {
             Set.of("il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "di", "del", "dello", "della", "dei", "degli",
                     "delle", "a", "al", "allo", "alla", "ai", "agli", "alle", "da", "dal", "dallo", "dalla", "dai", "dagli",
                     "dalle", "in", "nel", "nello", "nella", "nei", "negli", "nelle", "su", "sul", "sullo", "sulla", "sui",
-                    "sugli", "sulle", "con", "dentro"),
+                    "sugli", "sulle", "con", "dentro", "e"),
             Map.<String, String>ofEntries(
                     entry("start", """
-                            Sei %s e il tuo obbiettivo è trovare il tesoro nascosto.
+                            Sei %s e il tuo obiettivo è trovare il tesoro nascosto.
 
                             In ogni momento potrai scrivere "aiuto" se hai bisogno di una mano con i comandi.
                             Scrivi "guarda" per guardarti intorno e iniziare l'avventura!"""),

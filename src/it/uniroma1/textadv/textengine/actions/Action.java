@@ -212,7 +212,7 @@ public interface Action {
                 return l.getAnswer("open_wrong_opener").formatted(l.getAnswer((breakable ? "breaks" : "opens")));
             toOpen.unlock((Opener) item);
             if (!toOpen.isUnlocked())
-                return l.getAnswer("open_wrong_opener").formatted((breakable ? "breaks" : "opens"));
+                return l.getAnswer("open_wrong_opener").formatted(l.getAnswer((breakable ? "breaks" : "opens")));
         } else if (args.size() > 1)
             return l.getAnswer("open_unlocked").formatted(l.getAnswer((breakable ? "break_it" : "open_it")));
         toOpen.open();
