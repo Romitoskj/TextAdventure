@@ -1,9 +1,9 @@
 package it.uniroma1.textadv;
 
-import it.uniroma1.textadv.exceptions.ActionNotKnownException;
-import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
+import it.uniroma1.textadv.textengine.exceptions.ActionNotKnownException;
+import it.uniroma1.textadv.textengine.exceptions.LanguageNotKnownException;
 import it.uniroma1.textadv.personaggi.Giocatore;
-import it.uniroma1.textadv.personaggi.Observer;
+import it.uniroma1.textadv.interfaces.Observer;
 import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.Language;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;

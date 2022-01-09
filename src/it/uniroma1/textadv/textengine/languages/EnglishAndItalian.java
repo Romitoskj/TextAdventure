@@ -1,9 +1,9 @@
 package it.uniroma1.textadv.textengine.languages;
 
-import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
 import it.uniroma1.textadv.textengine.actions.ActionFactory;
 import it.uniroma1.textadv.textengine.actions.ENAction;
 import it.uniroma1.textadv.textengine.actions.ITAction;
+import it.uniroma1.textadv.textengine.exceptions.LanguageNotKnownException;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +21,7 @@ public enum EnglishAndItalian implements Language {
                     entry("start", """
                             You are  %s and your goal is to find the hidden treasure.
 
-                            You can write "help" in any moment if your struggle with the commands.
+                            You can write "help" in any moment if you are struggling with the commands.
                             Write "look" to look around the room and start the adventure!"""),
                     entry("not_found_action", "Unrecognized action."),
                     entry("win", "Well done! You found the treasure!"),

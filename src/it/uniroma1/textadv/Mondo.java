@@ -9,16 +9,18 @@ import java.util.*;
 
 
 import it.uniroma1.textadv.exceptions.*;
+import it.uniroma1.textadv.interfaces.Item;
+import it.uniroma1.textadv.interfaces.Storable;
 import it.uniroma1.textadv.links.Link;
-import it.uniroma1.textadv.oggetti.Blocker;
-import it.uniroma1.textadv.oggetti.Container;
-import it.uniroma1.textadv.oggetti.Oggetto;
-import it.uniroma1.textadv.oggetti.Opener;
+import it.uniroma1.textadv.oggetti.interfaces.Blocker;
+import it.uniroma1.textadv.oggetti.interfaces.Container;
+import it.uniroma1.textadv.oggetti.interfaces.Oggetto;
+import it.uniroma1.textadv.oggetti.interfaces.Opener;
 import it.uniroma1.textadv.personaggi.Giocatore;
-import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.personaggi.interfaces.Personaggio;
 
 /**
- * Rappresenta il mondo di gioco.
+ * Rappresenta il mondo in cui si ambienta il gioco. Esso contiene le varie stanze, oggetti e personaggi.
  */
 public class Mondo {
 
@@ -253,7 +255,7 @@ public class Mondo {
                 param = oggettoInfo[2];
                 constr = oggettoCls.getConstructor(String.class, String.class);
                 oggetto = constr.newInstance(name, param);
-                if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.Opener"))) {
+                if (c.getSuperclass().equals(Class.forName("it.uniroma1.textadv.oggetti.interfaces.Opener"))) {
                     l = LINKS.get(param);
                     if (l != null) // se oggetto è un opener di un link (param chiave in link)
                         l.lock((Opener) oggetto);

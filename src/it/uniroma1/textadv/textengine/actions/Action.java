@@ -1,16 +1,20 @@
 package it.uniroma1.textadv.textengine.actions;
 
 import it.uniroma1.textadv.Direzione;
-import it.uniroma1.textadv.Lockable;
-import it.uniroma1.textadv.Item;
-import it.uniroma1.textadv.Storable;
-import it.uniroma1.textadv.exceptions.ActionNotKnownException;
+import it.uniroma1.textadv.interfaces.Lockable;
+import it.uniroma1.textadv.interfaces.Item;
+import it.uniroma1.textadv.interfaces.Storable;
+import it.uniroma1.textadv.oggetti.interfaces.Breakable;
+import it.uniroma1.textadv.oggetti.interfaces.Container;
+import it.uniroma1.textadv.oggetti.interfaces.Oggetto;
+import it.uniroma1.textadv.oggetti.interfaces.Opener;
+import it.uniroma1.textadv.textengine.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
 import it.uniroma1.textadv.links.Link;
 import it.uniroma1.textadv.links.Teletrasporto;
 import it.uniroma1.textadv.oggetti.*;
-import it.uniroma1.textadv.personaggi.Animal;
-import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.personaggi.interfaces.Animal;
+import it.uniroma1.textadv.personaggi.interfaces.Personaggio;
 import it.uniroma1.textadv.personaggi.Venditore;
 import it.uniroma1.textadv.textengine.Command;
 import it.uniroma1.textadv.textengine.languages.Language;
@@ -37,7 +41,7 @@ public interface Action {
                 return l.getAnswer("cmd_not_found");
             }
         }
-        StringBuilder res = new StringBuilder().append("COMANDO\t\t|\t\tDESCRIZIONE\n\n");
+        StringBuilder res = new StringBuilder().append(l.getAnswer("help_headers"));
         for (Action a : actionFactory.values()) {
             res.append(a.getDescription()).append("\n");
         }

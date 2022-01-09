@@ -1,11 +1,11 @@
 package it.uniroma1.textadv.textengine;
 
 import it.uniroma1.textadv.Direzione;
-import it.uniroma1.textadv.Item;
+import it.uniroma1.textadv.interfaces.Item;
 import it.uniroma1.textadv.Mondo;
-import it.uniroma1.textadv.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.textengine.actions.Action;
 import it.uniroma1.textadv.textengine.actions.ActionFactory;
+import it.uniroma1.textadv.textengine.exceptions.ActionNotKnownException;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 

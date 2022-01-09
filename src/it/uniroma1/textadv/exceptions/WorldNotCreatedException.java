@@ -7,7 +7,7 @@ package it.uniroma1.textadv.exceptions;
 public class WorldNotCreatedException extends RuntimeException {
 
     /**
-     * Crea una NotCreatedWorldException.
+     * Crea una {@link WorldNotCreatedException}.
      */
     public WorldNotCreatedException() {
         super("Il mondo non è stato creato.");

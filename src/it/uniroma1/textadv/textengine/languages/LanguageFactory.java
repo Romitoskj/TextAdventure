@@ -1,6 +1,6 @@
 package it.uniroma1.textadv.textengine.languages;
 
-import it.uniroma1.textadv.exceptions.LanguageNotKnownException;
+import it.uniroma1.textadv.textengine.exceptions.LanguageNotKnownException;
 
 @FunctionalInterface
 public interface LanguageFactory {

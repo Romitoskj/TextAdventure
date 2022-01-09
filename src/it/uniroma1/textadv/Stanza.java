@@ -1,10 +1,12 @@
 package it.uniroma1.textadv;
 
 import it.uniroma1.textadv.exceptions.ItemNotPresentException;
+import it.uniroma1.textadv.interfaces.Item;
+import it.uniroma1.textadv.interfaces.Storable;
 import it.uniroma1.textadv.links.Link;
-import it.uniroma1.textadv.oggetti.Container;
-import it.uniroma1.textadv.oggetti.Oggetto;
-import it.uniroma1.textadv.personaggi.Personaggio;
+import it.uniroma1.textadv.oggetti.interfaces.Container;
+import it.uniroma1.textadv.oggetti.interfaces.Oggetto;
+import it.uniroma1.textadv.personaggi.interfaces.Personaggio;
 import it.uniroma1.textadv.textengine.languages.EnglishAndItalian;
 import it.uniroma1.textadv.textengine.languages.Language;
 
