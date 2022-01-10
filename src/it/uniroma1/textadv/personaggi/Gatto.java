@@ -26,4 +26,10 @@ public class Gatto extends Personaggio implements Animal, Storable {
         if (language.equals(EnglishAndItalian.IT)) return "MIAO!";
         else return "MEOW!";
     }
+
+    @Override
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return "un gatto chiamato " + getName();
+        else return "a cat called " + getName();
+    }
 }

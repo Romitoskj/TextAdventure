@@ -26,4 +26,10 @@ public class Cane extends Personaggio implements Animal {
         else return "WOOF!";
     }
 
+    @Override
+    public String getDescription(Language language) {
+        if (language.equals(EnglishAndItalian.IT)) return "un cane chiamato " + getName();
+        else return "a dog called " + getName();
+    }
+
 }
