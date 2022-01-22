@@ -105,7 +105,6 @@ public class Gioco implements Observer {
                 if (k >= 0) line = line.substring(0, k); // rimuove commenti
                 System.out.println(line);
                 command = Command.from(line.strip());
-                System.out.println(command);
                 output = command.execute();
             } catch (ActionNotKnownException e) {
                 output = Command.getLanguage().getAnswer("not_found_action");
