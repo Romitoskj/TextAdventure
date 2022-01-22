@@ -206,7 +206,7 @@ public enum EnglishAndItalian implements Language {
     }
 
     @Override
-    public Set<String> getSTOP_WORDS() {
+    public Set<String> getStopWords() {
         return STOP_WORDS;
     }
 

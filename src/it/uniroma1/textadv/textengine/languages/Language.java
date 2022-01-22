@@ -14,7 +14,7 @@ public interface Language {
      *
      * @return l'insieme delle stop word
      */
-    Set<String> getSTOP_WORDS();
+    Set<String> getStopWords();
 
     /**
      * Restituisce l'{@link ActionFactory} relativa alla lingua.

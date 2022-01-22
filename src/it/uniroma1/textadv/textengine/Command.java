@@ -137,7 +137,7 @@ public class Command {
 
                 if (range == 1) {
                     dir = Direzione.get(name);
-                    if (language.getSTOP_WORDS().stream().anyMatch(s -> s.equals(args.get(0))))
+                    if (language.getStopWords().stream().anyMatch(s -> s.equals(args.get(0))))
                         args.remove(0);
                     else if (dir != null) {
                         args.remove(0);
