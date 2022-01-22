@@ -34,7 +34,7 @@ public class Command {
     /**
      * Action factory con cui ottenere le varie azioni. Quella predefinita viene fornita dalla lingua italiana.
      */
-    private static ActionFactory factory = EnglishAndItalian.IT.getActionFactory();
+    private static ActionFactory factory = language.getActionFactory();
 
     /**
      * Azione che il giocatore compie.
